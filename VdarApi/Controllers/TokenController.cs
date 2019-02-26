@@ -95,6 +95,7 @@ namespace VdarApi.Controllers
                 CreatedDateUTC = DateTime.UtcNow
             };
 
+            //Добавляем токен в таблицу БД
             if (_tokenRP.AddToken(TokenPair))
             {
                 return new ResponseData
