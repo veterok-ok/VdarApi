@@ -19,11 +19,12 @@ namespace VdarApi.Repositories
         {
             try
             {
-                _context.TokensPair.RemoveRange(
-                    _context.TokensPair.Where(
-                        z => z.FingerPrint.Equals(FingerPrint) && z.ClientId.Equals(ClientId)).ToList()
-                );
-                _context.SaveChanges();
+                List<TokensPair> _list = _context.TokensPair.Where(
+                           z => z.FingerPrint.Equals(FingerPrint) && z.ClientId.Equals(ClientId)).ToList();
+                if (_list.Count > 0) { 
+                    _context.TokensPair.RemoveRange(_list);
+                    _context.SaveChanges();
+                }
             }
             catch {  }
         }
@@ -36,7 +37,7 @@ namespace VdarApi.Repositories
                 _context.TokensPair.Add(token);
                 return _context.SaveChanges() > 0;
             }
-            catch {
+            catch(Exception ex) {
                 return false;
             }
         }

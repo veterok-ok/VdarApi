@@ -87,11 +87,12 @@ namespace VdarApi.Controllers
             var TokenPair = new TokensPair
             {
                 Id = Guid.NewGuid().ToString(),
-                ClientId = _user.ClientId,                
-                RefreshToken = refresh_token,
+                ClientId = _user.ClientId,
                 AccessToken = GetJwt(_user),
-                FingerPrint = parameters.finger_print,
-                UpdateHashSum = _user.GetHashCode().ToString()
+                RefreshToken = refresh_token,
+                UpdateHashSum = _user.GetHashCode().ToString(),
+                FingerPrint = parameters.finger_print??"",
+                CreatedDateUTC = DateTime.UtcNow
             };
 
             if (_tokenRP.AddToken(TokenPair))

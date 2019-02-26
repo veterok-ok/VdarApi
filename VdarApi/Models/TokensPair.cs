@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace VdarApi.Models
 {
     [Table("tokens")]
-    public class TokensPair : EnityBase
+    public class TokensPair
     {
         [Column("id")]
         [Key]
@@ -34,11 +34,9 @@ namespace VdarApi.Models
         [Required]
         public string FingerPrint { get; set; }
 
-    }
-    public abstract class EnityBase
-    {
         [Column("created_date_utc")]
-        [Required, DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        [Required]
         public DateTime CreatedDateUTC { get; set; }
+
     }
 }
