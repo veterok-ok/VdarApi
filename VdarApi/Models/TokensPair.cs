@@ -9,7 +9,7 @@ namespace VdarApi.Models
 {
     [Table("tokens")]
     public class TokensPair
-    {
+    {        
         [Column("id")]
         [Key]
         public string Id { get; set; }
