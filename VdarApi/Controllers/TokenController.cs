@@ -102,18 +102,14 @@ namespace VdarApi.Controllers
                    .Select(c => c.Value).SingleOrDefault()
             };
 
-            string claims_hash = User.Claims.Where(c => c.Type == ClaimTypes.Hash)
-                   .Select(c => c.Value).SingleOrDefault();
+            string claims_hash = User.FindFirstValue(ClaimTypes.Hash);
 
 
             if (token.UpdateHashSum.Equals(claims_hash))
             {
                 //подтягиваем данные из существующего JWT
-                _user.UserName = User.Claims.Where(c => c.Type == ClaimsIdentity.DefaultNameClaimType)
-                       .Select(c => c.Value).SingleOrDefault();
-
-                _user.UserRole = User.Claims.Where(c => c.Type == ClaimsIdentity.DefaultRoleClaimType)
-                       .Select(c => c.Value).SingleOrDefault();
+                _user.UserName = User.FindFirstValue(ClaimsIdentity.DefaultNameClaimType);
+                _user.UserRole = User.FindFirstValue(ClaimsIdentity.DefaultRoleClaimType);
             }
             else
             {

@@ -44,17 +44,30 @@ namespace VdarApi.Repositories
 
         public bool RefreshToken(TokensPair token)
         {
-            _context.TokensPair.Update(token);
-            return _context.SaveChanges() > 0;
+            try
+            {
+                _context.TokensPair.Update(token);
+                return _context.SaveChanges() > 0;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         public TokensPair GetToken(string finger_print, string access_token, string refresh_token)
         {
-            return _context.TokensPair.FirstOrDefault(
-                    x =>    x.FingerPrint.Equals(finger_print) &&
-                            x.RefreshToken.Equals(refresh_token) &&
-                            x.AccessToken.Equals(access_token)
-            );
+            try { 
+                return _context.TokensPair.FirstOrDefault(
+                        x =>    x.FingerPrint.Equals(finger_print) &&
+                                x.RefreshToken.Equals(refresh_token) &&
+                                x.AccessToken.Equals(access_token)
+                );
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
         }
     }
 }
