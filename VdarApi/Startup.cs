@@ -34,7 +34,7 @@ namespace VdarApi
             string connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<VdarDbContext>(options =>
                 options.UseSqlServer(connection));
-
+            //блаблаблаblablabla
             //Внедрение зависимости
             services.AddScoped<IRTokenRepository, RTokenRepository>();
 
