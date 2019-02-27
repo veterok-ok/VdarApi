@@ -17,7 +17,17 @@ namespace VdarApi.Controllers
 {
     public class TokenController : Controller
     {
-
+        /* Расшифровка Code
+         * 901 - Нет данных в запросе [FromQuery]
+         * 902 - Указанный пользователь не найдет
+         * 903 - Пользователь не аутентифицирован (отсутствует JWT в заголовке)
+         * 904 - Неверный Grand_Type
+         * 905 - Не найден Token обновления в запросе
+         * 906 - Не удалось обновить токен в БД
+         * 909 - Не удалось добавить новый токен в БД
+         * 910 - Не удалось обновить токен в БД
+         * 999 - Всё ок
+         */
         private IRTokenRepository _tokenRP;
 
         public TokenController(IRTokenRepository tokenRepository)
@@ -47,7 +57,20 @@ namespace VdarApi.Controllers
             }
             else if (parameters.grant_type == "refresh_token")
             {
-                await Response.WriteAsync(JsonConvert.SerializeObject(DoRefreshToken(parameters), new JsonSerializerSettings { Formatting = Formatting.Indented }));
+                if (User.Identity.IsAuthenticated)
+                {
+                    await Response.WriteAsync(JsonConvert.SerializeObject(DoRefreshToken(parameters), new JsonSerializerSettings { Formatting = Formatting.Indented }));
+                }
+                else
+                {
+                    var response = new ResponseData
+                    {
+                        Code = "903",
+                        Message = "User Is Not Authenticated",
+                        Data = null
+                    };
+                    await Response.WriteAsync(JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented }));
+                }
             }
             else
             {
@@ -80,7 +103,7 @@ namespace VdarApi.Controllers
             }
 
             // Удаляем токен пользователя (в разрезе браузера), на случай если он украден
-            _tokenRP.RemoveToken(_user.ClientId, parameters.finger_print);
+            _tokenRP.RemoveToken(_user.ClientId, parameters.finger_print??"");
 
             //Формируем новый токен
             var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
@@ -88,7 +111,7 @@ namespace VdarApi.Controllers
             {
                 Id = Guid.NewGuid().ToString(),
                 ClientId = _user.ClientId,
-                AccessToken = GetJwt(_user),
+                AccessToken = GetJwt(_user.ClientId, _user.UserName, _user.UserRole, _user.GetHashCode().ToString()),
                 RefreshToken = refresh_token,
                 UpdateHashSum = _user.GetHashCode().ToString(),
                 FingerPrint = parameters.finger_print??"",
@@ -121,8 +144,9 @@ namespace VdarApi.Controllers
 
         private ResponseData DoRefreshToken(Parameters parameters)
         {
-            var token = _tokenRP.GetToken(parameters.finger_print, parameters.access_token, parameters.refresh_token);
-
+            string access_token = ControllerContext.HttpContext.Request.Headers["Authorization"].ToString().Split(' ')[1];
+            var token = _tokenRP.GetToken(parameters.finger_print??"", access_token, parameters.refresh_token);
+            
             if (token == null)
             {
                 return new ResponseData
@@ -133,17 +157,47 @@ namespace VdarApi.Controllers
                 };
             }
 
-            return null;
-            //if (token.UpdateHashSum == parameters.update_hash_sum)
+            string claims_client_id, claims_name, claims_role, claims_hash;
+
+            claims_hash = User.Claims.Where(c => c.Type == ClaimTypes.Hash)
+                   .Select(c => c.Value).SingleOrDefault();
+
+            claims_client_id = User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier)
+                   .Select(c => c.Value).SingleOrDefault();
+
+            if (token.UpdateHashSum.Equals(claims_hash))
+            {
+                //подтягиваем данные из существующего JWT
+                claims_name = User.Claims.Where(c => c.Type == ClaimsIdentity.DefaultNameClaimType)
+                       .Select(c => c.Value).SingleOrDefault();
+
+                claims_role = User.Claims.Where(c => c.Type == ClaimsIdentity.DefaultRoleClaimType)
+                       .Select(c => c.Value).SingleOrDefault();
+            }
+            else
+            {
+                //подтягиваем данные из БД
+                var _user = UserInfo.GetAllUsers()
+                           .SingleOrDefault(z => z.ClientId.Equals(claims_client_id));
+
+                if (_user == null)
+                {
+                    return new ResponseData
+                    {
+                        Code = "902",
+                        Message = "invalid user infomation",
+                        Data = null
+                    };
+                }
+                claims_name = _user.UserName;
+                claims_role = _user.UserRole;
+                claims_hash = token.UpdateHashSum;
+            }
 
 
-           /* var _user = UserInfo.GetAllUsers()
-                       .SingleOrDefault(z => token.ClientId.Equals(z.ClientId));*/
-
-
-           /* var updateFlag = _tokenRP.RefreshToken(token);
-
-            if (updateFlag)
+            token.CreatedDateUTC = DateTime.UtcNow;
+            token.AccessToken = GetJwt(claims_client_id, claims_name, claims_role, claims_hash);
+            if (_tokenRP.RefreshToken(token))
             {
                 return new ResponseData
                 {
@@ -151,7 +205,8 @@ namespace VdarApi.Controllers
                     Message = "OK",
                     Data = new
                     {
-                        access_token = ""//TokenPair.AccessToken
+                        access_token = token.AccessToken,
+                        refresh_token = token.RefreshToken
                     }
                 };
             }
@@ -159,23 +214,24 @@ namespace VdarApi.Controllers
             {
                 return new ResponseData
                 {
-                    Code = "910",
-                    Message = "can not expire token or a new token",
+                    Code = "906",
+                    Message = "can not add token to database",
                     Data = null
                 };
-            }*/
+            }
         }
 
 
-        private string GetJwt(UserInfo client)
+        private string GetJwt(string clientID, string clientName, string clientRole, string clientHash)
         {
             var now = DateTime.UtcNow;
 
             var claims = new Claim[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, client.ClientId),
-                new Claim(ClaimsIdentity.DefaultNameClaimType, client.UserName),
-                new Claim(ClaimsIdentity.DefaultRoleClaimType, client.UserRole)
+                new Claim(ClaimTypes.NameIdentifier, clientID),
+                new Claim(ClaimsIdentity.DefaultNameClaimType, clientName),
+                new Claim(ClaimsIdentity.DefaultRoleClaimType, clientRole),
+                new Claim(ClaimTypes.Hash, clientHash)
             };
 
             var jwt = new JwtSecurityToken(
@@ -183,7 +239,7 @@ namespace VdarApi.Controllers
                     audience: AuthOptions.AUDIENCE,
                     notBefore: now,
                     claims: claims,
-                    expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                    expires: now.Add(TimeSpan.FromSeconds(AuthOptions.LIFETIME)),
                     signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 

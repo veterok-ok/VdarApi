@@ -34,10 +34,9 @@ namespace VdarApi
             string connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<VdarDbContext>(options =>
                 options.UseSqlServer(connection));
-            //блаблаблаblablabla
-            //Внедрение зависимости
-            services.AddScoped<IRTokenRepository, RTokenRepository>();
 
+            //Внедрение зависимости, взаимодействие с БД
+            services.AddScoped<IRTokenRepository, RTokenRepository>();
 
             //Подключение кроссдоменных запросов
             services.AddCors();
@@ -58,7 +57,7 @@ namespace VdarApi
                             // установка потребителя токена
                             ValidAudience = AuthOptions.AUDIENCE,
                             // будет ли валидироваться время существования
-                            ValidateLifetime = true,
+                            ValidateLifetime = false,
                             // установка ключа безопасности
                             IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
                             // валидация ключа безопасности
