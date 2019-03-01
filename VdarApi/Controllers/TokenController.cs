@@ -66,7 +66,7 @@ namespace VdarApi.Controllers
 
             //Формируем новый токен
             var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
-            var TokenPair = new TokensPair
+            var token = new Tokens
             {
                 Id = Guid.NewGuid().ToString(),
                 ClientId = _user.ClientId,
@@ -78,11 +78,11 @@ namespace VdarApi.Controllers
             };
 
             //Добавляем токен в таблицу БД
-            if (_tokenRP.AddToken(TokenPair))
+            if (_tokenRP.AddToken(token))
                 return new ResponseData(999, new
                 {
-                    access_token = TokenPair.AccessToken,
-                    refresh_token = TokenPair.RefreshToken
+                    access_token = token.AccessToken,
+                    refresh_token = token.RefreshToken
                 });
             else
                 return new ResponseData(905);

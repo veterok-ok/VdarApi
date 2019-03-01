@@ -19,10 +19,10 @@ namespace VdarApi.Repositories
         {
             try
             {
-                var _list = _context.TokensPair.Where(
+                var _list = _context.Tokens.Where(
                            z => z.FingerPrint.Equals(FingerPrint) && z.ClientId.Equals(ClientId));
                 if (_list.Count() > 0) { 
-                    _context.TokensPair.RemoveRange(_list);
+                    _context.Tokens.RemoveRange(_list);
                     _context.SaveChanges();
                 }
             }
@@ -30,11 +30,11 @@ namespace VdarApi.Repositories
         }
 
 
-        public bool AddToken(TokensPair token)
+        public bool AddToken(Tokens token)
         {
             try
             {
-                _context.TokensPair.Add(token);
+                _context.Tokens.Add(token);
                 return _context.SaveChanges() > 0;
             }
             catch(Exception ex) {
@@ -42,11 +42,11 @@ namespace VdarApi.Repositories
             }
         }
 
-        public bool RefreshToken(TokensPair token)
+        public bool RefreshToken(Tokens token)
         {
             try
             {
-                _context.TokensPair.Update(token);
+                _context.Tokens.Update(token);
                 return _context.SaveChanges() > 0;
             }
             catch (Exception ex)
@@ -55,10 +55,10 @@ namespace VdarApi.Repositories
             }
         }
 
-        public TokensPair GetToken(string finger_print, string access_token, string refresh_token)
+        public Tokens GetToken(string finger_print, string access_token, string refresh_token)
         {
             try { 
-                return _context.TokensPair.FirstOrDefault(
+                return _context.Tokens.FirstOrDefault(
                         x =>    x.FingerPrint.Equals(finger_print) &&
                                 x.RefreshToken.Equals(refresh_token) &&
                                 x.AccessToken.Equals(access_token)

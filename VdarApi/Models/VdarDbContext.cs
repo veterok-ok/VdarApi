@@ -16,7 +16,7 @@ namespace VdarApi.Models
 
         }
 
-        public DbSet<TokensPair> TokensPair { get; set; }
+        public DbSet<Tokens> Tokens { get; set; }
       
     }
 }
