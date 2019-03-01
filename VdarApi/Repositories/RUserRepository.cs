@@ -14,6 +14,20 @@ namespace VdarApi.Repositories
             this._context = context;
         }
 
+        public User GetUser(string id)
+        {
+            try
+            {
+                return _context.Users.FirstOrDefault(
+                        x => x.Id.Equals(id)
+                );
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
         public User LoginUser(string login, string password)
         {
             try

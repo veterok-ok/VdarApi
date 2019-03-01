@@ -18,10 +18,12 @@ namespace VdarApi.Controllers
     public class TokenController : Controller
     {
         private IRTokenRepository _tokenRP;
+        private IRUserRepository _userRP;
 
-        public TokenController(IRTokenRepository tokenRepository)
+        public TokenController(IRTokenRepository tokenRepository, IRUserRepository userRepository)
         {
             this._tokenRP = tokenRepository;
+            this._userRP = userRepository;
         }
 
         private async Task SendResponse(ResponseData response)
@@ -54,22 +56,20 @@ namespace VdarApi.Controllers
 
         private ResponseData DoAuthentication(Parameters parameters)
         {
-            var _user = UserInfo.GetAllUsers()
-                        .SingleOrDefault( z => z.Password.Equals(parameters.password) 
-                                            && z.UserName.Equals(parameters.username));
+            User _user = _userRP.LoginUser(parameters.username, parameters.password);
             
             if (_user == null)
                 return new ResponseData(904);
 
             // Удаляем токен пользователя (в разрезе браузера), на случай если он украден
-            _tokenRP.RemoveToken(_user.ClientId, parameters.finger_print??"");
+            _tokenRP.RemoveToken(_user.Id, parameters.finger_print??"");
 
             //Формируем новый токен
             var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
             var token = new Tokens
             {
                 Id = Guid.NewGuid().ToString(),
-                ClientId = _user.ClientId,
+                ClientId = _user.Id,
                 AccessToken = GetJwt(_user, _user.GetHashCode().ToString()),
                 RefreshToken = refresh_token,
                 UpdateHashSum = _user.GetHashCode().ToString(),
@@ -95,15 +95,14 @@ namespace VdarApi.Controllers
         private ResponseData DoRefreshToken(Parameters parameters)
         {
             string access_token = ControllerContext.HttpContext.Request.Headers["Authorization"].ToString().Split(' ')[1];
-            var token = _tokenRP.GetToken(parameters.finger_print??"", access_token, parameters.refresh_token);
-            
+            var token = _tokenRP.GetToken(parameters.finger_print ?? "", access_token, parameters.refresh_token);
+
             if (token == null)
                 return new ResponseData(906);
 
-            UserInfo _user = new UserInfo()
+            User _user = new User()
             {
-                ClientId = User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier)
-                   .Select(c => c.Value).SingleOrDefault()
+                Id = User.FindFirstValue(ClaimTypes.NameIdentifier)
             };
 
             string claims_hash = User.FindFirstValue(ClaimTypes.Hash);
@@ -112,14 +111,12 @@ namespace VdarApi.Controllers
             if (token.UpdateHashSum.Equals(claims_hash))
             {
                 //подтягиваем данные из существующего JWT
-                _user.UserName = User.FindFirstValue(ClaimsIdentity.DefaultNameClaimType);
-                _user.UserRole = User.FindFirstValue(ClaimsIdentity.DefaultRoleClaimType);
+                _user.Name = User.FindFirstValue(ClaimsIdentity.DefaultNameClaimType);
             }
             else
             {
                 //подтягиваем данные из БД
-                _user = UserInfo.GetAllUsers()
-                           .SingleOrDefault(z => z.ClientId.Equals(_user.ClientId));
+                _user = _userRP.GetUser(_user.Id);
 
                 if (_user == null)
                     return new ResponseData(904);
@@ -144,15 +141,14 @@ namespace VdarApi.Controllers
         }
 
 
-        private string GetJwt(UserInfo info, string clientHash)
+        private string GetJwt(User info, string clientHash)
         {
             var now = DateTime.UtcNow;
 
             var claims = new Claim[]
             {
-                new Claim(ClaimTypes.NameIdentifier, info.ClientId),
-                new Claim(ClaimsIdentity.DefaultNameClaimType, info.UserName),
-                new Claim(ClaimsIdentity.DefaultRoleClaimType, info.UserRole),
+                new Claim(ClaimTypes.NameIdentifier, info.Id),
+                new Claim(ClaimsIdentity.DefaultNameClaimType, info.Name),
                 new Claim(ClaimTypes.Hash, clientHash)
             };
 

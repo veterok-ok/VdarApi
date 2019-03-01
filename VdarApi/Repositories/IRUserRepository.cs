@@ -8,6 +8,7 @@ namespace VdarApi.Repositories
 {
     public interface IRUserRepository
     {
+        User GetUser (string id);
         User LoginUser (string login, string password);
     }
 }
