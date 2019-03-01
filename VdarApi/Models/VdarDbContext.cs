@@ -17,6 +17,8 @@ namespace VdarApi.Models
         }
 
         public DbSet<Tokens> Tokens { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<ConfirmationKey> ConfirmationKeys { get; set; }
       
     }
 }
