@@ -74,7 +74,11 @@ namespace VdarApi.Controllers
                 RefreshToken = refresh_token,
                 UpdateHashSum = _user.GetHashCode().ToString(),
                 FingerPrint = parameters.finger_print??"",
-                CreatedDateUTC = DateTime.UtcNow
+                LastRefreshDateUTC = DateTime.UtcNow,
+                CreatedDateUTC = DateTime.UtcNow,
+                UserAgent = parameters.user_agent,
+                Location = parameters.location,
+                IP = parameters.ip
             };
 
             //Добавляем токен в таблицу БД
@@ -123,8 +127,12 @@ namespace VdarApi.Controllers
                 claims_hash = token.UpdateHashSum;
             }
 
-            token.CreatedDateUTC = DateTime.UtcNow;
+            token.LastRefreshDateUTC = DateTime.UtcNow;
             token.AccessToken = GetJwt(_user, claims_hash);
+            token.Location = parameters.location;
+            token.IP = parameters.ip;
+            token.UserAgent = parameters.user_agent;
+
             if (_tokenRP.RefreshToken(token))
                 return new ResponseData(999, new
                 {
