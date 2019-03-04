@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -46,5 +47,11 @@ namespace VdarApi.Repositories
                 return null;
             }
         }
+
+        async public Task<bool> UserExistAsync(string phone)
+        {
+            return await _context.Users.AnyAsync(z => z.PhoneNumber.Equals(phone));
+        }
+
     }
 }

@@ -10,5 +10,6 @@ namespace VdarApi.Repositories
     {
         User GetUser (string id);
         User LoginUser (string login, string password);
+        Task<bool> UserExistAsync (string phone);
     }
 }
