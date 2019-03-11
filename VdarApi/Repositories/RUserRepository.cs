@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VdarApi.Models;
+using VdarApi.ViewModels;
 
 namespace VdarApi.Repositories
 {
@@ -48,10 +49,13 @@ namespace VdarApi.Repositories
             }
         }
 
-        async public Task<bool> UserExistAsync(string phone)
-        {
-            return await _context.Users.AnyAsync(z => z.PhoneNumber.Equals(phone));
-        }
+        async public Task<User> GetUserByPhoneAsync(string phone) => 
+            await _context.Users.SingleOrDefaultAsync(z => z.PhoneNumber.Equals(phone));
 
+        async public Task InsertBlankUserAsync(User user)
+        {
+            _context.Add(user);
+            await _context.SaveChangesAsync();
+        }
     }
 }

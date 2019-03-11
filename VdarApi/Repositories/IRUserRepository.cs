@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VdarApi.Models;
+using VdarApi.ViewModels;
 
 namespace VdarApi.Repositories
 {
@@ -10,6 +11,7 @@ namespace VdarApi.Repositories
     {
         User GetUser (string id);
         User LoginUser (string login, string password);
-        Task<bool> UserExistAsync (string phone);
+        Task<User> GetUserByPhoneAsync(string phone);
+        Task InsertBlankUserAsync(RegistrationViewModel model);
     }
 }

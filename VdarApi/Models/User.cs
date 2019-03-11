@@ -12,7 +12,6 @@ namespace VdarApi.Models
         [Key]
         public string Id { get; set; }
 
-        [Required]
         public string Login { get; set; }
 
         [Required]
@@ -28,6 +27,7 @@ namespace VdarApi.Models
         [Required]
         public string Password { get; set; }
 
+        [Required]
         public string PhoneNumber { get; set; }
 
         public bool PhoneIsConfirmed { get; set; }
