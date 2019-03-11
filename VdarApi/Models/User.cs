@@ -10,7 +10,7 @@ namespace VdarApi.Models
     public class User
     {
         [Key]
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         public string Login { get; set; }
 

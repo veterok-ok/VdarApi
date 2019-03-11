@@ -11,10 +11,10 @@ namespace VdarApi.Models
     {
 
         [Key]
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
-        public string ClientId { get; set; }
+        public int ClientId { get; set; }
 
         [Required]
         public string AccessToken { get; set; }

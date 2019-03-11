@@ -9,10 +9,10 @@ namespace VdarApi.Models
     public class ConfirmationKey
     {
         [Key]
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
-        public string UserId { get; set; }
+        public int UserId { get; set; }
 
         [Required]
         public string Key { get; set; }
@@ -23,7 +23,7 @@ namespace VdarApi.Models
         [Required]
         public DateTime CreatedDateUTC { get; set; }
 
-        //Дата окончания жизни ключа подвтерждения
+        //Дата окончания жизни ключа подтверждения
         public DateTime ExpireDateUTC { get; set; }
 
     }

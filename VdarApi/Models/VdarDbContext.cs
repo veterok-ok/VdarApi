@@ -25,7 +25,6 @@ namespace VdarApi.Models
 
             User[] users = new User[]{
                 new User {
-                    Id = Guid.NewGuid().ToString(),
                     Password = "123",
                     Name = "Viktor",
                     SurName = "Bochikalov",
@@ -41,18 +40,12 @@ namespace VdarApi.Models
                     CreatedDateUtc = DateTime.UtcNow
                 },
                 new User {
-                    Id = Guid.NewGuid().ToString(),
                     Password = "123",
                     Name = "Levon",
                     SurName = "Kukuyan",
                     PhoneNumber = "7771940504",
-                    EmailIsConfirmed = true,
                     PhoneIsConfirmed = false,
                     IsActive = true,
-                    Login = "lamer",
-                    ActivatedDateUtc = DateTime.UtcNow.AddSeconds(-22492),
-                    Birthday = DateTime.Parse("13.02.1991"),
-                    Email = "l.kukuyan@mail.ru",
                     CreatedDateUtc = DateTime.UtcNow
                 }
             };
