@@ -16,7 +16,7 @@ namespace VdarApi.Repositories
             this._context = context;
         }
 
-        public User GetUser(string id)
+        public User GetUser(int id)
         {
             try
             {

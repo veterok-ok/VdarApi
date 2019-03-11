@@ -68,7 +68,6 @@ namespace VdarApi.Controllers
             var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
             var token = new Tokens
             {
-                Id = Guid.NewGuid().ToString(),
                 ClientId = _user.Id,
                 AccessToken = GetJwt(_user, _user.GetHashCode().ToString()),
                 RefreshToken = refresh_token,
@@ -102,7 +101,7 @@ namespace VdarApi.Controllers
 
             User _user = new User()
             {
-                Id = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                Id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))
             };
 
             string claims_hash = User.FindFirstValue(ClaimTypes.Hash);
@@ -147,7 +146,7 @@ namespace VdarApi.Controllers
 
             var claims = new Claim[]
             {
-                new Claim(ClaimTypes.NameIdentifier, info.Id),
+                new Claim(ClaimTypes.NameIdentifier, info.Id.ToString()),
                 new Claim(ClaimsIdentity.DefaultNameClaimType, info.Name),
                 new Claim(ClaimTypes.Hash, clientHash)
             };

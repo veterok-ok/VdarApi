@@ -12,7 +12,7 @@ namespace VdarApi.Repositories
 
         bool RefreshToken(Tokens token);
 
-        void RemoveToken(string ClientId, string FingerPrint);
+        void RemoveToken(int ClientId, string FingerPrint);
 
         Tokens GetToken(string finger_print, string access_token, string refresh_token);
 

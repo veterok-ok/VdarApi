@@ -43,7 +43,7 @@ namespace VdarApi.Controllers
                     PhoneIsConfirmed = false,
                     CreatedDateUtc = DateTime.UtcNow
                 };
-                await _userRP.InsertBlankUserAsync(model);
+                await _userRP.InsertBlankUserAsync(user);
             }
                        
 

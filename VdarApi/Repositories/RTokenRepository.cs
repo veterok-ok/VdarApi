@@ -15,7 +15,7 @@ namespace VdarApi.Repositories
             this._context = context;
         }
 
-        public void RemoveToken(string ClientId, string FingerPrint)
+        public void RemoveToken(int ClientId, string FingerPrint)
         {
             try
             {

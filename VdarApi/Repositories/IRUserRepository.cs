@@ -9,9 +9,9 @@ namespace VdarApi.Repositories
 {
     public interface IRUserRepository
     {
-        User GetUser (string id);
+        User GetUser (int id);
         User LoginUser (string login, string password);
         Task<User> GetUserByPhoneAsync(string phone);
-        Task InsertBlankUserAsync(RegistrationViewModel model);
+        Task InsertBlankUserAsync(User model);
     }
 }
