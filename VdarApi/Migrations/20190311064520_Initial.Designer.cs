@@ -10,21 +10,22 @@ using VdarApi.Models;
 namespace VdarApi.Migrations
 {
     [DbContext(typeof(VdarDbContext))]
-    [Migration("20190301140217_Initial")]
+    [Migration("20190311064520_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.8-servicing-32085")
+                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("VdarApi.Models.ConfirmationKey", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("CreatedDateUTC");
 
@@ -36,8 +37,7 @@ namespace VdarApi.Migrations
                     b.Property<string>("KeyType")
                         .IsRequired();
 
-                    b.Property<string>("UserId")
-                        .IsRequired();
+                    b.Property<int>("UserId");
 
                     b.HasKey("Id");
 
@@ -46,14 +46,14 @@ namespace VdarApi.Migrations
 
             modelBuilder.Entity("VdarApi.Models.Tokens", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AccessToken")
                         .IsRequired();
 
-                    b.Property<string>("ClientId")
-                        .IsRequired();
+                    b.Property<int>("ClientId");
 
                     b.Property<DateTime>("CreatedDateUTC");
 
@@ -81,8 +81,9 @@ namespace VdarApi.Migrations
 
             modelBuilder.Entity("VdarApi.Models.User", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("ActivatedDateUtc");
 
@@ -98,8 +99,7 @@ namespace VdarApi.Migrations
 
                     b.Property<bool>("IsActive");
 
-                    b.Property<string>("Login")
-                        .IsRequired();
+                    b.Property<string>("Login");
 
                     b.Property<string>("Name")
                         .IsRequired();
@@ -109,7 +109,8 @@ namespace VdarApi.Migrations
 
                     b.Property<bool>("PhoneIsConfirmed");
 
-                    b.Property<string>("PhoneNumber");
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired();
 
                     b.Property<string>("SurName")
                         .IsRequired();
@@ -119,8 +120,8 @@ namespace VdarApi.Migrations
                     b.ToTable("Users");
 
                     b.HasData(
-                        new { Id = "3391464a-19ad-4983-b169-5ff06e8eb601", ActivatedDateUtc = new DateTime(2019, 2, 15, 13, 18, 5, 439, DateTimeKind.Utc), Birthday = new DateTime(1992, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), CreatedDateUtc = new DateTime(2019, 3, 1, 14, 2, 17, 440, DateTimeKind.Utc), Email = "admin@google.com", EmailIsConfirmed = false, FathersName = "Andreevich", IsActive = true, Login = "vektor", Name = "Viktor", Password = "123", PhoneIsConfirmed = true, PhoneNumber = "7771291221", SurName = "Bochikalov" },
-                        new { Id = "7fefa895-0f87-446a-852d-5358052df30f", ActivatedDateUtc = new DateTime(2019, 3, 1, 7, 47, 25, 440, DateTimeKind.Utc), Birthday = new DateTime(1991, 2, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), CreatedDateUtc = new DateTime(2019, 3, 1, 14, 2, 17, 440, DateTimeKind.Utc), Email = "l.kukuyan@mail.ru", EmailIsConfirmed = true, IsActive = true, Login = "lamer", Name = "Levon", Password = "123", PhoneIsConfirmed = false, PhoneNumber = "7771940504", SurName = "Kukuyan" }
+                        new { Id = 1, ActivatedDateUtc = new DateTime(2019, 2, 25, 6, 1, 8, 454, DateTimeKind.Utc), Birthday = new DateTime(1992, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), CreatedDateUtc = new DateTime(2019, 3, 11, 6, 45, 20, 455, DateTimeKind.Utc), Email = "admin@google.com", EmailIsConfirmed = false, FathersName = "Andreevich", IsActive = true, Login = "vektor", Name = "Viktor", Password = "123", PhoneIsConfirmed = true, PhoneNumber = "7771291221", SurName = "Bochikalov" },
+                        new { Id = 2, ActivatedDateUtc = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), Birthday = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), CreatedDateUtc = new DateTime(2019, 3, 11, 6, 45, 20, 455, DateTimeKind.Utc), EmailIsConfirmed = false, IsActive = true, Name = "Levon", Password = "123", PhoneIsConfirmed = false, PhoneNumber = "7771940504", SurName = "Kukuyan" }
                     );
                 });
 #pragma warning restore 612, 618

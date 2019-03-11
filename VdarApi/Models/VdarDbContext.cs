@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,9 +23,9 @@ namespace VdarApi.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             User[] users = new User[]{
                 new User {
+                    Id = 1,
                     Password = "123",
                     Name = "Viktor",
                     SurName = "Bochikalov",
@@ -40,6 +41,7 @@ namespace VdarApi.Models
                     CreatedDateUtc = DateTime.UtcNow
                 },
                 new User {
+                    Id = 2,
                     Password = "123",
                     Name = "Levon",
                     SurName = "Kukuyan",
@@ -50,8 +52,8 @@ namespace VdarApi.Models
                 }
             };
 
-
             modelBuilder.Entity<User>().HasData(users);
+
             base.OnModelCreating(modelBuilder);
         }
     }
