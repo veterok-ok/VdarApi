@@ -38,6 +38,7 @@ namespace VdarApi
             //Внедрение зависимости, взаимодействие с БД
             services.AddScoped<IRTokenRepository, RTokenRepository>();
             services.AddScoped<IRUserRepository, RUserRepository>();
+            services.AddScoped<IRConfirmationRepository, RConfirmationRepository>();
 
             //Подключение кроссдоменных запросов
             services.AddCors();
