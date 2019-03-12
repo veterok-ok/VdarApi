@@ -35,10 +35,10 @@ namespace VdarApi.Repositories
             try
             {
                 return _context.Users.FirstOrDefault(
-                        x => x.Password.Equals(password) && 
+                        x => x.Password.Equals(password) &&
                              (
-                                x.Login.Equals(login) || 
-                                x.Email.Equals(login) || 
+                                x.Login.Equals(login) ||
+                                x.Email.Equals(login) ||
                                 x.PhoneNumber.Equals(login)
                               )
                 );
@@ -49,7 +49,7 @@ namespace VdarApi.Repositories
             }
         }
 
-        async public Task<User> GetUserByPhoneAsync(string phone) => 
+        async public Task<User> GetUserByPhoneAsync(string phone) =>
             await _context.Users.SingleOrDefaultAsync(z => z.PhoneNumber.Equals(phone));
 
         async public Task InsertBlankUserAsync(User user)
@@ -57,5 +57,13 @@ namespace VdarApi.Repositories
             _context.Add(user);
             await _context.SaveChangesAsync();
         }
+
+        async public Task SetConfirmationPhoneAsync(User user){
+            user.ActivatedDateUtc = DateTime.UtcNow;
+            user.PhoneIsConfirmed = true;
+            _context.Update(user);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

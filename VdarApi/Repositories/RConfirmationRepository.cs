@@ -33,5 +33,14 @@ namespace VdarApi.Repositories
             _context.Add(model);
             await _context.SaveChangesAsync();
         }
+
+        async public Task RemoveConfirmationKeysAsync(ConfirmationKey model)
+        {
+            var _result = _context.ConfirmationKeys.Where(c =>
+                          c.KeyType.Equals(model.KeyType, StringComparison.CurrentCultureIgnoreCase) && 
+                          c.UserId.Equals(model.UserId));
+            _context.RemoveRange(_result);
+            await _context.SaveChangesAsync();
+        }
     }
 }

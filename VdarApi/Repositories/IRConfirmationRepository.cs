@@ -11,5 +11,6 @@ namespace VdarApi.Repositories
         Task<int> GetCountAttemptConfirmationAsync(int IdUser, string KeyType);
         Task InsertConfirmationKeyAsync(ConfirmationKey model);
         Task<bool> CheckConfirmationKeyAsync(ConfirmationKey model);
+        Task RemoveConfirmationKeysAsync(ConfirmationKey model);
     }
 }
