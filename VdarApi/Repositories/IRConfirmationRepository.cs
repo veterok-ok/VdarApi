@@ -8,7 +8,7 @@ namespace VdarApi.Repositories
 {
     public interface IRConfirmationRepository
     {
-        Task<int> GetCountAttemptConfirmationAsync(string KeyType);
+        Task<int> GetCountAttemptConfirmationAsync(int IdUser, string KeyType);
         Task InsertConfirmationKeyAsync(ConfirmationKey model);
         Task<bool> CheckConfirmationKeyAsync(ConfirmationKey model);
     }

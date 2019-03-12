@@ -16,10 +16,13 @@ namespace VdarApi.Controllers
     {
 
         private IRUserRepository _userRP;
+        private IRConfirmationRepository _confirmationRepository;
 
-        public AccountController(IRUserRepository userRepository)
+        public AccountController(IRUserRepository userRepository, IRConfirmationRepository confirmationRepository)
         {
             this._userRP = userRepository;
+            this._confirmationRepository = confirmationRepository;
+
         }
 
         [HttpPost("/registration")]
@@ -45,10 +48,20 @@ namespace VdarApi.Controllers
                 };
                 await _userRP.InsertBlankUserAsync(user);
             }
-                       
+            
+            if( await _confirmationRepository.GetCountAttemptConfirmationAsync(user.Id, "SMS") > 2)
+                return new RegistrationResult(903);
 
-            //Тут создать код подтверждения, выслать его через sms, и записать в БД
+            ConfirmationKey key = new ConfirmationKey()
+            {
+                UserId = user.Id,
+                Key = "1234",
+                KeyType = "SMS",
+                CreatedDateUTC = DateTime.UtcNow,
+                ExpireDateUTC = DateTime.UtcNow.AddMinutes(30)
+            };
 
+            await _confirmationRepository.InsertConfirmationKeyAsync(key);
 
             return new RegistrationResult(999);
         }

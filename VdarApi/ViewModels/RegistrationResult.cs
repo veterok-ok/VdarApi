@@ -25,6 +25,7 @@ namespace VdarApi.ViewModels
         {
             {901, "No data in query"},//Нет данных в запросе для заполнения ViewModel
             {902, "User with the same phone already exists"},//Пользователь с таким номером уже существует
+            {903, "A large number of SMS has been sent to this phone number"},//На данный номер отправлено много смс
             {999, "OK" }//Всё ок
         };
     }

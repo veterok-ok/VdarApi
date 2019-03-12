@@ -24,7 +24,7 @@ namespace VdarApi.Repositories
                 );
         
 
-        async public Task<int> GetCountAttemptConfirmationAsync(string KeyType) => 
+        async public Task<int> GetCountAttemptConfirmationAsync(int IdUser, string KeyType) => 
             await _context.ConfirmationKeys.AsNoTracking().CountAsync(c => 
                  c.KeyType.Equals(KeyType, StringComparison.CurrentCultureIgnoreCase));
 
