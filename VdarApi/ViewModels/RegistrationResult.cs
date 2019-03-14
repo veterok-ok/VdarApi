@@ -28,6 +28,7 @@ namespace VdarApi.ViewModels
             {903, "A large number of SMS has been sent to this phone number"},//На данный номер отправлено много смс
             {904, "Incorrect Security Code" },//Введен неверный код подтверждения
             {905, "User is missing" },//Данного пользователя нет в базе данных
+            {906, "Confirmation code incorect" },//Введенные данные по подтверждению кода не найдены в БД 
             {999, "OK" }//Всё ок
         };
     }

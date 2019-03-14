@@ -49,6 +49,12 @@ namespace VdarApi.Repositories
             }
         }
 
+        async public Task<User> GetUserByLoginAsync(string login) =>
+            await _context.Users.SingleOrDefaultAsync(z => z.Login.Equals(login));
+
+        async public Task<User> GetUserByEmailAsync(string email) =>
+            await _context.Users.SingleOrDefaultAsync(z => z.Email.Equals(email));
+
         async public Task<User> GetUserByPhoneAsync(string phone) =>
             await _context.Users.SingleOrDefaultAsync(z => z.PhoneNumber.Equals(phone));
 

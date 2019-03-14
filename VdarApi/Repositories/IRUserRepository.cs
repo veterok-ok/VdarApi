@@ -12,6 +12,8 @@ namespace VdarApi.Repositories
         User GetUser (int id);
         User LoginUser (string login, string password);
         Task<User> GetUserByPhoneAsync(string phone);
+        Task<User> GetUserByEmailAsync(string email);
+        Task<User> GetUserByLoginAsync(string login);
         Task InsertBlankUserAsync(User model);
         Task SetConfirmationPhoneAsync(User model);
     }

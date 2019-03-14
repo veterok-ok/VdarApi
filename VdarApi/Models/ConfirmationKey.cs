@@ -20,6 +20,8 @@ namespace VdarApi.Models
         [Required]
         public string KeyType { get; set; }
 
+        public string HashCode { get; set; }
+
         [Required]
         public DateTime CreatedDateUTC { get; set; }
 

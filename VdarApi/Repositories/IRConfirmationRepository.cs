@@ -12,5 +12,7 @@ namespace VdarApi.Repositories
         Task InsertConfirmationKeyAsync(ConfirmationKey model);
         Task<bool> CheckConfirmationKeyAsync(ConfirmationKey model);
         Task RemoveConfirmationKeysAsync(ConfirmationKey model);
+        Task<ConfirmationKey> GetConfirmationAsync(ConfirmationKey model);
+        Task SetHashCodeAsync(ConfirmationKey model);
     }
 }

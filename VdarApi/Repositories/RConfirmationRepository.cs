@@ -22,7 +22,13 @@ namespace VdarApi.Repositories
                    c.UserId.Equals(model.UserId) &&
                    c.Key.Equals(model.Key)
                 );
-        
+
+        async public Task<ConfirmationKey> GetConfirmationAsync(ConfirmationKey model) =>
+            await _context.ConfirmationKeys.SingleOrDefaultAsync(c =>
+                   c.KeyType.Equals(model.KeyType, StringComparison.CurrentCultureIgnoreCase) &&
+                   c.UserId.Equals(model.UserId) &&
+                   c.Key.Equals(model.Key)
+                );
 
         async public Task<int> GetCountAttemptConfirmationAsync(int IdUser, string KeyType) => 
             await _context.ConfirmationKeys.AsNoTracking().CountAsync(c => 
@@ -42,5 +48,12 @@ namespace VdarApi.Repositories
             _context.RemoveRange(_result);
             await _context.SaveChangesAsync();
         }
+
+        async public Task SetHashCodeAsync(ConfirmationKey model)
+        {
+            _context.Update(model);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }
