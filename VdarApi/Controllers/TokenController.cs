@@ -26,7 +26,7 @@ namespace VdarApi.Controllers
             this._userRP = userRepository;
         }
 
-        private async Task SendResponse(ResponseData response)
+        private async Task SendResponse(TokenResult response)
         {
             Response.ContentType = "application/json";
             await Response.WriteAsync(JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented }));
@@ -36,7 +36,7 @@ namespace VdarApi.Controllers
         public async Task Token([FromQuery]Parameters parameters)
         {
             if (parameters == null)
-                await SendResponse(new ResponseData(901));
+                await SendResponse(new TokenResult(901));
 
             switch (parameters.grant_type)
             {
@@ -46,20 +46,20 @@ namespace VdarApi.Controllers
                     if (User.Identity.IsAuthenticated)
                         await SendResponse(DoRefreshToken(parameters));
                     else
-                        await SendResponse(new ResponseData(903));
+                        await SendResponse(new TokenResult(903));
                     break;
                 default:
-                    await SendResponse(new ResponseData(902)); break;
+                    await SendResponse(new TokenResult(902)); break;
             };           
 
         }
 
-        private ResponseData DoAuthentication(Parameters parameters)
+        private TokenResult DoAuthentication(Parameters parameters)
         {
             User _user = _userRP.LoginUser(parameters.username, parameters.password);
             
             if (_user == null)
-                return new ResponseData(904);
+                return new TokenResult(904);
 
             // Удаляем токен пользователя (в разрезе браузера), на случай если он украден
             _tokenRP.RemoveToken(_user.Id, parameters.finger_print??"");
@@ -82,22 +82,22 @@ namespace VdarApi.Controllers
 
             //Добавляем токен в таблицу БД
             if (_tokenRP.AddToken(token))
-                return new ResponseData(999, new
+                return new TokenResult(999, new
                 {
                     access_token = token.AccessToken,
                     refresh_token = token.RefreshToken
                 });
             else
-                return new ResponseData(905);
+                return new TokenResult(905);
         }
 
-        private ResponseData DoRefreshToken(Parameters parameters)
+        private TokenResult DoRefreshToken(Parameters parameters)
         {
             string access_token = ControllerContext.HttpContext.Request.Headers["Authorization"].ToString().Split(' ')[1];
             var token = _tokenRP.GetToken(parameters.finger_print ?? "", access_token, parameters.refresh_token);
 
             if (token == null)
-                return new ResponseData(906);
+                return new TokenResult(906);
 
             User _user = new User()
             {
@@ -118,7 +118,7 @@ namespace VdarApi.Controllers
                 _user = _userRP.GetUser(_user.Id);
 
                 if (_user == null)
-                    return new ResponseData(904);
+                    return new TokenResult(904);
 
                 claims_hash = token.UpdateHashSum;
             }
@@ -130,13 +130,13 @@ namespace VdarApi.Controllers
             token.UserAgent = parameters.user_agent;
 
             if (_tokenRP.RefreshToken(token))
-                return new ResponseData(999, new
+                return new TokenResult(999, new
                 {
                     access_token = token.AccessToken,
                     refresh_token = token.RefreshToken
                 });
             else
-                return new ResponseData(907);
+                return new TokenResult(907);
         }
 
 

@@ -5,21 +5,10 @@ using System.Threading.Tasks;
 
 namespace VdarApi.ViewModels
 {
-    public class RegistrationResult
+    public class RegistrationResult : TokenResult
     {
-        public int Code { get; set; }
-        public string Message { get; set; }
-
-        public RegistrationResult(int Code, object Data)
-        {
-            this.Code = Code;
-            this.Message = keys[Code];
-        }
-        public RegistrationResult(int Code)
-        {
-            this.Code = Code;
-            this.Message = keys[Code];
-        }
+        public RegistrationResult(int Code, object Data) : base(Code, Data) { Message = keys[Code]; }
+        public RegistrationResult(int Code) : base(Code) { Message = keys[Code]; }
 
         private readonly Dictionary<int, string> keys = new Dictionary<int, string>()
         {
