@@ -15,10 +15,8 @@ namespace VdarApi.Models
 
         public string Login { get; set; }
 
-        [Required]
         public string Name { get; set; }
 
-        [Required]
         public string SurName { get; set; }
 
         public string FathersName { get; set; }

@@ -30,9 +30,7 @@ namespace VdarApi.Controllers
         {
             if (
                String.IsNullOrEmpty(model.Password) ||
-               String.IsNullOrEmpty(model.Phone) ||
-               String.IsNullOrEmpty(model.Name) ||
-               String.IsNullOrEmpty(model.SurName)
+               String.IsNullOrEmpty(model.Phone)
                )
                 return new RegistrationResult(901);
 
@@ -44,8 +42,6 @@ namespace VdarApi.Controllers
             if (user == null) {
                 user = new User()
                 {
-                    Name = model.Name,
-                    SurName = model.SurName,
                     Password = model.Password,
                     PhoneNumber = model.Phone,
                     PhoneIsConfirmed = false,
@@ -77,9 +73,7 @@ namespace VdarApi.Controllers
             if (
                 String.IsNullOrEmpty(model.Password) ||
                 String.IsNullOrEmpty(model.Phone) ||
-                String.IsNullOrEmpty(model.SecurityCode) ||
-                String.IsNullOrEmpty(model.Name) ||
-                String.IsNullOrEmpty(model.SurName)
+                String.IsNullOrEmpty(model.SecurityCode)
                 )
                 return new RegistrationResult(901);
 
