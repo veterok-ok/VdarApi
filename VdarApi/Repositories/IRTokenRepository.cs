@@ -8,13 +8,13 @@ namespace VdarApi.Repositories
 {
     public interface IRTokenRepository
     {
-        bool AddToken(Tokens token);
+        Task AddTokenAsync(Tokens token);
 
-        bool RefreshToken(Tokens token);
+        Task RefreshTokenAsync(Tokens token);
 
-        void RemoveToken(int ClientId, string FingerPrint);
+        Task RemoveTokenAsync(int ClientId, string FingerPrint);
 
-        Tokens GetToken(string finger_print, string access_token, string refresh_token);
+        Task<Tokens> GetTokenAsync(string finger_print, string access_token, string refresh_token);
 
     }
 }

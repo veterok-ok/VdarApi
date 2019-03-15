@@ -9,8 +9,8 @@ namespace VdarApi.Repositories
 {
     public interface IRUserRepository
     {
-        User GetUser (int id);
-        User LoginUser (string login, string password);
+        Task<User> GetUserAsync (int id);
+        Task<User> LoginUserAsync (string login, string password);
         Task<User> GetUserByPhoneAsync(string phone);
         Task<User> GetUserByEmailAsync(string email);
         Task<User> GetUserByLoginAsync(string login);

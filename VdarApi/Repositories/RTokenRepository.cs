@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,59 +16,34 @@ namespace VdarApi.Repositories
             this._context = context;
         }
 
-        public void RemoveToken(int ClientId, string FingerPrint)
+        async public Task RemoveTokenAsync(int ClientId, string FingerPrint)
         {
-            try
-            {
-                var _list = _context.Tokens.Where(
-                           z => z.FingerPrint.Equals(FingerPrint) && z.ClientId.Equals(ClientId));
-                if (_list.Count() > 0) { 
+            var _list = await _context.Tokens.Where(
+                           z => z.FingerPrint.Equals(FingerPrint) && z.ClientId.Equals(ClientId)).ToListAsync();
+            
+            if (_list.Count() > 0) { 
                     _context.Tokens.RemoveRange(_list);
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
                 }
-            }
-            catch {  }
+        }
+        
+        async public Task AddTokenAsync(Tokens token)            
+        {
+            _context.Tokens.Add(token);
+            await _context.SaveChangesAsync();
         }
 
-
-        public bool AddToken(Tokens token)
+        async public Task RefreshTokenAsync(Tokens token)
         {
-            try
-            {
-                _context.Tokens.Add(token);
-                return _context.SaveChanges() > 0;
-            }
-            catch(Exception ex) {
-                return false;
-            }
+            _context.Tokens.Update(token);
+             await _context.SaveChangesAsync();
         }
 
-        public bool RefreshToken(Tokens token)
-        {
-            try
-            {
-                _context.Tokens.Update(token);
-                return _context.SaveChanges() > 0;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
-
-        public Tokens GetToken(string finger_print, string access_token, string refresh_token)
-        {
-            try { 
-                return _context.Tokens.FirstOrDefault(
+        async public Task<Tokens> GetTokenAsync(string finger_print, string access_token, string refresh_token) =>
+         await _context.Tokens.FirstOrDefaultAsync(
                         x =>    x.FingerPrint.Equals(finger_print) &&
                                 x.RefreshToken.Equals(refresh_token) &&
                                 x.AccessToken.Equals(access_token)
-                );
-            }
-            catch(Exception ex)
-            {
-                return null;
-            }
-        }
+                );        
     }
 }

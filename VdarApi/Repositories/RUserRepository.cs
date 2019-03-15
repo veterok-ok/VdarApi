@@ -16,25 +16,14 @@ namespace VdarApi.Repositories
             this._context = context;
         }
 
-        public User GetUser(int id)
-        {
-            try
-            {
-                return _context.Users.FirstOrDefault(
+        async public Task<User> GetUserAsync(int id) =>
+            await _context.Users.FirstOrDefaultAsync(
                         x => x.Id.Equals(id)
                 );
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
+        
 
-        public User LoginUser(string login, string password)
-        {
-            try
-            {
-                return _context.Users.FirstOrDefault(
+        async public Task<User> LoginUserAsync(string login, string password) =>
+            await _context.Users.FirstOrDefaultAsync(
                         x => x.Password.Equals(password) &&
                              (
                                 x.Login.Equals(login) ||
@@ -42,12 +31,7 @@ namespace VdarApi.Repositories
                                 x.PhoneNumber.Equals(login)
                               )
                 );
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
+            
 
         async public Task<User> GetUserByLoginAsync(string login) =>
             await _context.Users.SingleOrDefaultAsync(z => z.Login.Equals(login));

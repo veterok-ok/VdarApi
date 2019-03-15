@@ -15,7 +15,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace VdarApi.Controllers
 {
-    public class TokenController : Controller
+    [Route("api/[action]")]
+    [ApiController]
+    public class TokenController : ControllerBase
     {
         private IRTokenRepository _tokenRP;
         private IRUserRepository _userRP;
@@ -26,43 +28,36 @@ namespace VdarApi.Controllers
             this._userRP = userRepository;
         }
 
-        private async Task SendResponse(TokenResult response)
-        {
-            Response.ContentType = "application/json";
-            await Response.WriteAsync(JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented }));
-        }
-
-        [HttpPost("/token")]
-        public async Task Token([FromQuery]Parameters parameters)
+        [HttpPost]
+        public async Task<ActionResult<TokenResult>> Token([FromQuery]Parameters parameters)
         {
             if (parameters == null)
-                await SendResponse(new TokenResult(901));
+                return new TokenResult(901);
 
             switch (parameters.grant_type)
             {
                 case "password":
-                    await SendResponse(DoAuthentication(parameters)); break;
+                        return await DoAuthenticationAsync(parameters);
                 case "refresh_token":
                     if (User.Identity.IsAuthenticated)
-                        await SendResponse(DoRefreshToken(parameters));
+                        return await DoRefreshTokenAsync(parameters);
                     else
-                        await SendResponse(new TokenResult(903));
-                    break;
+                        return new TokenResult(903);
                 default:
-                    await SendResponse(new TokenResult(902)); break;
+                    return new TokenResult(902);
             };           
 
         }
 
-        private TokenResult DoAuthentication(Parameters parameters)
+        private async Task<TokenResult> DoAuthenticationAsync(Parameters parameters)
         {
-            User _user = _userRP.LoginUser(parameters.username, parameters.password);
+            User _user = await _userRP.LoginUserAsync(parameters.username, parameters.password);
             
             if (_user == null)
                 return new TokenResult(904);
 
             // Удаляем токен пользователя (в разрезе браузера), на случай если он украден
-            _tokenRP.RemoveToken(_user.Id, parameters.finger_print??"");
+            await _tokenRP.RemoveTokenAsync(_user.Id, parameters.finger_print??"");
 
             //Формируем новый токен
             var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
@@ -81,20 +76,19 @@ namespace VdarApi.Controllers
             };
 
             //Добавляем токен в таблицу БД
-            if (_tokenRP.AddToken(token))
-                return new TokenResult(999, new
+            await _tokenRP.AddTokenAsync(token);
+
+            return new TokenResult(999, new
                 {
                     access_token = token.AccessToken,
                     refresh_token = token.RefreshToken
                 });
-            else
-                return new TokenResult(905);
         }
 
-        private TokenResult DoRefreshToken(Parameters parameters)
+        private async Task<TokenResult> DoRefreshTokenAsync(Parameters parameters)
         {
             string access_token = ControllerContext.HttpContext.Request.Headers["Authorization"].ToString().Split(' ')[1];
-            var token = _tokenRP.GetToken(parameters.finger_print ?? "", access_token, parameters.refresh_token);
+            var token = await _tokenRP.GetTokenAsync(parameters.finger_print ?? "", access_token, parameters.refresh_token);
 
             if (token == null)
                 return new TokenResult(906);
@@ -115,7 +109,7 @@ namespace VdarApi.Controllers
             else
             {
                 //подтягиваем данные из БД
-                _user = _userRP.GetUser(_user.Id);
+                _user = await _userRP.GetUserAsync(_user.Id);
 
                 if (_user == null)
                     return new TokenResult(904);
@@ -129,14 +123,14 @@ namespace VdarApi.Controllers
             token.IP = parameters.ip;
             token.UserAgent = parameters.user_agent;
 
-            if (_tokenRP.RefreshToken(token))
-                return new TokenResult(999, new
+            await _tokenRP.RefreshTokenAsync(token);
+
+            return new TokenResult(999, new
                 {
                     access_token = token.AccessToken,
                     refresh_token = token.RefreshToken
                 });
-            else
-                return new TokenResult(907);
+            
         }
 
 
