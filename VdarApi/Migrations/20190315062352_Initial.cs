@@ -17,6 +17,7 @@ namespace VdarApi.Migrations
                     UserId = table.Column<int>(nullable: false),
                     Key = table.Column<string>(nullable: false),
                     KeyType = table.Column<string>(nullable: false),
+                    HashCode = table.Column<string>(nullable: true),
                     CreatedDateUTC = table.Column<DateTime>(nullable: false),
                     ExpireDateUTC = table.Column<DateTime>(nullable: false)
                 },
@@ -54,8 +55,8 @@ namespace VdarApi.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Login = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(nullable: false),
-                    SurName = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    SurName = table.Column<string>(nullable: true),
                     FathersName = table.Column<string>(nullable: true),
                     Birthday = table.Column<DateTime>(nullable: false),
                     Password = table.Column<string>(nullable: false),
@@ -75,12 +76,12 @@ namespace VdarApi.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "ActivatedDateUtc", "Birthday", "CreatedDateUtc", "Email", "EmailIsConfirmed", "FathersName", "IsActive", "Login", "Name", "Password", "PhoneIsConfirmed", "PhoneNumber", "SurName" },
-                values: new object[] { 1, new DateTime(2019, 2, 25, 6, 1, 8, 454, DateTimeKind.Utc), new DateTime(1992, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2019, 3, 11, 6, 45, 20, 455, DateTimeKind.Utc), "admin@google.com", false, "Andreevich", true, "vektor", "Viktor", "123", true, "7771291221", "Bochikalov" });
+                values: new object[] { 1, new DateTime(2019, 3, 1, 5, 39, 40, 611, DateTimeKind.Utc), new DateTime(1992, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2019, 3, 15, 6, 23, 52, 611, DateTimeKind.Utc), "admin@google.com", false, "Andreevich", true, "vektor", "Viktor", "123", true, "7771291221", "Bochikalov" });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "ActivatedDateUtc", "Birthday", "CreatedDateUtc", "Email", "EmailIsConfirmed", "FathersName", "IsActive", "Login", "Name", "Password", "PhoneIsConfirmed", "PhoneNumber", "SurName" },
-                values: new object[] { 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2019, 3, 11, 6, 45, 20, 455, DateTimeKind.Utc), null, false, null, true, null, "Levon", "123", false, "7771940504", "Kukuyan" });
+                values: new object[] { 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2019, 3, 15, 6, 23, 52, 611, DateTimeKind.Utc), null, false, null, true, null, "Levon", "123", false, "7771940504", "Kukuyan" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

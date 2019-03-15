@@ -10,8 +10,8 @@ using VdarApi.ViewModels;
 
 namespace VdarApi.Controllers
 {
-    [Route("api/account/[controller]")]
-    [ApiController]
+    [Route("api/[controller]/[action]")]
+    [ApiController]    
     public class AccountController : ControllerBase
     {
 
@@ -25,8 +25,8 @@ namespace VdarApi.Controllers
 
         }
 
-        [HttpPost("/registration")]
-        public async Task<ActionResult<RegistrationResult>> Registration(RegistrationViewModel model)
+        [HttpPost]
+        public async Task<ActionResult<RegistrationResult>> Registration([FromQuery]RegistrationViewModel model)
         {
             if (
                String.IsNullOrEmpty(model.Password) ||
@@ -67,8 +67,8 @@ namespace VdarApi.Controllers
             return new RegistrationResult(999);
         }
 
-        [HttpPost("/registration/confirm")]
-        public async Task<ActionResult<RegistrationResult>> RegistrationConfirm(RegistrationViewModel model)
+        [HttpPost]
+        public async Task<ActionResult<RegistrationResult>> RegistrationConfirm([FromQuery]RegistrationViewModel model)
         {
             if (
                 String.IsNullOrEmpty(model.Password) ||

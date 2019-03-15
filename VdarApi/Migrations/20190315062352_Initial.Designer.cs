@@ -10,7 +10,7 @@ using VdarApi.Models;
 namespace VdarApi.Migrations
 {
     [DbContext(typeof(VdarDbContext))]
-    [Migration("20190311064520_Initial")]
+    [Migration("20190315062352_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,6 +30,8 @@ namespace VdarApi.Migrations
                     b.Property<DateTime>("CreatedDateUTC");
 
                     b.Property<DateTime>("ExpireDateUTC");
+
+                    b.Property<string>("HashCode");
 
                     b.Property<string>("Key")
                         .IsRequired();
@@ -101,8 +103,7 @@ namespace VdarApi.Migrations
 
                     b.Property<string>("Login");
 
-                    b.Property<string>("Name")
-                        .IsRequired();
+                    b.Property<string>("Name");
 
                     b.Property<string>("Password")
                         .IsRequired();
@@ -112,16 +113,15 @@ namespace VdarApi.Migrations
                     b.Property<string>("PhoneNumber")
                         .IsRequired();
 
-                    b.Property<string>("SurName")
-                        .IsRequired();
+                    b.Property<string>("SurName");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
 
                     b.HasData(
-                        new { Id = 1, ActivatedDateUtc = new DateTime(2019, 2, 25, 6, 1, 8, 454, DateTimeKind.Utc), Birthday = new DateTime(1992, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), CreatedDateUtc = new DateTime(2019, 3, 11, 6, 45, 20, 455, DateTimeKind.Utc), Email = "admin@google.com", EmailIsConfirmed = false, FathersName = "Andreevich", IsActive = true, Login = "vektor", Name = "Viktor", Password = "123", PhoneIsConfirmed = true, PhoneNumber = "7771291221", SurName = "Bochikalov" },
-                        new { Id = 2, ActivatedDateUtc = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), Birthday = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), CreatedDateUtc = new DateTime(2019, 3, 11, 6, 45, 20, 455, DateTimeKind.Utc), EmailIsConfirmed = false, IsActive = true, Name = "Levon", Password = "123", PhoneIsConfirmed = false, PhoneNumber = "7771940504", SurName = "Kukuyan" }
+                        new { Id = 1, ActivatedDateUtc = new DateTime(2019, 3, 1, 5, 39, 40, 611, DateTimeKind.Utc), Birthday = new DateTime(1992, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), CreatedDateUtc = new DateTime(2019, 3, 15, 6, 23, 52, 611, DateTimeKind.Utc), Email = "admin@google.com", EmailIsConfirmed = false, FathersName = "Andreevich", IsActive = true, Login = "vektor", Name = "Viktor", Password = "123", PhoneIsConfirmed = true, PhoneNumber = "7771291221", SurName = "Bochikalov" },
+                        new { Id = 2, ActivatedDateUtc = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), Birthday = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), CreatedDateUtc = new DateTime(2019, 3, 15, 6, 23, 52, 611, DateTimeKind.Utc), EmailIsConfirmed = false, IsActive = true, Name = "Levon", Password = "123", PhoneIsConfirmed = false, PhoneNumber = "7771940504", SurName = "Kukuyan" }
                     );
                 });
 #pragma warning restore 612, 618

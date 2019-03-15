@@ -67,6 +67,7 @@ namespace VdarApi.Repositories
         async public Task SetConfirmationPhoneAsync(User user){
             user.ActivatedDateUtc = DateTime.UtcNow;
             user.PhoneIsConfirmed = true;
+            user.IsActive = true;
             _context.Update(user);
             await _context.SaveChangesAsync();
         }
