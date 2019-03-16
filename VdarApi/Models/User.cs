@@ -21,7 +21,7 @@ namespace VdarApi.Models
 
         public string FathersName { get; set; }
 
-        public DateTime Birthday { get; set; }
+        public DateTime? Birthday { get; set; }
 
         [Required]
         public string Password { get; set; }
@@ -37,7 +37,7 @@ namespace VdarApi.Models
 
         public bool IsActive { get; set; }
 
-        public DateTime ActivatedDateUtc { get; set; }
+        public DateTime? ActivatedDateUtc { get; set; }
 
         public DateTime CreatedDateUtc { get; set; }
 

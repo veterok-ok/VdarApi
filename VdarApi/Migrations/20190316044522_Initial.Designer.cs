@@ -10,14 +10,14 @@ using VdarApi.Models;
 namespace VdarApi.Migrations
 {
     [DbContext(typeof(VdarDbContext))]
-    [Migration("20190315062352_Initial")]
+    [Migration("20190316044522_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
+                .HasAnnotation("ProductVersion", "2.1.8-servicing-32085")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -87,9 +87,9 @@ namespace VdarApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("ActivatedDateUtc");
+                    b.Property<DateTime?>("ActivatedDateUtc");
 
-                    b.Property<DateTime>("Birthday");
+                    b.Property<DateTime?>("Birthday");
 
                     b.Property<DateTime>("CreatedDateUtc");
 
@@ -120,8 +120,8 @@ namespace VdarApi.Migrations
                     b.ToTable("Users");
 
                     b.HasData(
-                        new { Id = 1, ActivatedDateUtc = new DateTime(2019, 3, 1, 5, 39, 40, 611, DateTimeKind.Utc), Birthday = new DateTime(1992, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), CreatedDateUtc = new DateTime(2019, 3, 15, 6, 23, 52, 611, DateTimeKind.Utc), Email = "admin@google.com", EmailIsConfirmed = false, FathersName = "Andreevich", IsActive = true, Login = "vektor", Name = "Viktor", Password = "123", PhoneIsConfirmed = true, PhoneNumber = "7771291221", SurName = "Bochikalov" },
-                        new { Id = 2, ActivatedDateUtc = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), Birthday = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), CreatedDateUtc = new DateTime(2019, 3, 15, 6, 23, 52, 611, DateTimeKind.Utc), EmailIsConfirmed = false, IsActive = true, Name = "Levon", Password = "123", PhoneIsConfirmed = false, PhoneNumber = "7771940504", SurName = "Kukuyan" }
+                        new { Id = 1, ActivatedDateUtc = new DateTime(2019, 3, 2, 4, 1, 9, 837, DateTimeKind.Utc), Birthday = new DateTime(1992, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), CreatedDateUtc = new DateTime(2019, 3, 16, 4, 45, 21, 837, DateTimeKind.Utc), Email = "admin@google.com", EmailIsConfirmed = false, FathersName = "Andreevich", IsActive = true, Login = "vektor", Name = "Viktor", Password = "123", PhoneIsConfirmed = true, PhoneNumber = "7771291221", SurName = "Bochikalov" },
+                        new { Id = 2, CreatedDateUtc = new DateTime(2019, 3, 16, 4, 45, 21, 838, DateTimeKind.Utc), EmailIsConfirmed = false, IsActive = true, Name = "Levon", Password = "123", PhoneIsConfirmed = false, PhoneNumber = "7771940504", SurName = "Kukuyan" }
                     );
                 });
 #pragma warning restore 612, 618
