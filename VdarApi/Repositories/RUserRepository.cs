@@ -56,5 +56,10 @@ namespace VdarApi.Repositories
             await _context.SaveChangesAsync();
         }
 
+        async public Task UpdateUserAsync(User user)
+        {
+            _context.Update(user);
+            await _context.SaveChangesAsync();
+        }
     }
 }

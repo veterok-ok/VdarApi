@@ -49,6 +49,11 @@ namespace VdarApi.Controllers
                 };
                 await _userRP.InsertBlankUserAsync(user);
             }
+            else if (!user.Password.Equals(model.Password))
+            {
+                user.Password = model.Password;
+                await _userRP.UpdateUserAsync(user);
+            }
 
             if (await _confirmationRP.GetCountAttemptConfirmationAsync(user.Id, "SMS") > 2)
                 return new RegistrationResult(903);
