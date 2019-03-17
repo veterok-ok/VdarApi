@@ -37,9 +37,7 @@ namespace VdarApi
                 options.UseSqlServer(connection));
 
             services.ConfigureRepositoryWrapper();
-
-            //Подключение кроссдоменных запросов
-            services.AddCors();
+            services.ConfigureCors();
 
             //Подключение аутентификации JWT
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -81,8 +79,7 @@ namespace VdarApi
                 app.UseHsts();
             }
 
-            //Разрешить запросы с любых источников
-            app.UseCors(builder => builder.AllowAnyOrigin());
+            app.UseCors();
 
             app.UseAuthentication();
 
