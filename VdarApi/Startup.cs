@@ -31,37 +31,10 @@ namespace VdarApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //Подключение Базы данных
-            string connection = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<VdarDbContext>(options =>
-                options.UseSqlServer(connection));
-
+            services.ConfigureDatabase(Configuration.GetConnectionString("DefaultConnection"));
             services.ConfigureRepositoryWrapper();
             services.ConfigureCors();
-
-            //Подключение аутентификации JWT
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddJwtBearer(options =>
-                    {
-                        options.RequireHttpsMetadata = false;
-                        options.TokenValidationParameters = new TokenValidationParameters
-                        {
-                            // указывает, будет ли валидироваться издатель при валидации токена
-                            ValidateIssuer = true,
-                            // строка, представляющая издателя
-                            ValidIssuer = AuthOptions.ISSUER,
-                            // будет ли валидироваться потребитель токена
-                            ValidateAudience = true,
-                            // установка потребителя токена
-                            ValidAudience = AuthOptions.AUDIENCE,
-                            // будет ли валидироваться время существования
-                            ValidateLifetime = false,
-                            // установка ключа безопасности
-                            IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                            // валидация ключа безопасности
-                            ValidateIssuerSigningKey = true,
-                        };
-                    });
+            services.ConfigureAuthentication();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
