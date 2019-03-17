@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using VdarApi.Contracts;
 using VdarApi.Models;
 using VdarApi.Repositories;
 using VdarApi.ViewModels;
@@ -14,15 +15,11 @@ namespace VdarApi.Controllers
     [ApiController]    
     public class AccountController : ControllerBase
     {
+        private IRepositoryWrapper _repo;
 
-        private IRUserRepository _userRP;
-        private IRConfirmationRepository _confirmationRP;
-
-        public AccountController(IRUserRepository userRepository, IRConfirmationRepository confirmationRepository)
+        public AccountController(IRepositoryWrapper wrapperRepository)
         {
-            this._userRP = userRepository;
-            this._confirmationRP = confirmationRepository;
-
+            this._repo = wrapperRepository;
         }
 
         [HttpPost]
@@ -34,7 +31,7 @@ namespace VdarApi.Controllers
                )
                 return new RegistrationResult(901);
 
-            var user = await _userRP.GetUserByPhoneAsync(model.Phone);
+            var user = await _repo.User.GetUserByPhoneAsync(model.Phone);
 
             if (user != null && user.PhoneIsConfirmed)
                 return new RegistrationResult(902);
@@ -47,15 +44,17 @@ namespace VdarApi.Controllers
                     PhoneIsConfirmed = false,
                     CreatedDateUtc = DateTime.UtcNow
                 };
-                await _userRP.InsertBlankUserAsync(user);
+                _repo.User.Create(user);
             }
             else if (!user.Password.Equals(model.Password))
             {
                 user.Password = model.Password;
-                await _userRP.UpdateUserAsync(user);
+                _repo.User.Update(user);
             }
 
-            if (await _confirmationRP.GetCountAttemptConfirmationAsync(user.Id, "SMS") > 2)
+            await _repo.User.SaveAsync();
+
+            if (await _repo.ConfirmationKey.GetCountAttemptConfirmationAsync(user.Id, "SMS") > 2)
                 return new RegistrationResult(903);
 
             ConfirmationKey key = new ConfirmationKey()
@@ -67,7 +66,8 @@ namespace VdarApi.Controllers
                 ExpireDateUTC = DateTime.UtcNow.AddMinutes(30)
             };
 
-            await _confirmationRP.InsertConfirmationKeyAsync(key);
+            _repo.ConfirmationKey.Create(key);
+            await _repo.ConfirmationKey.SaveAsync();
 
             return new RegistrationResult(999);
         }
@@ -82,7 +82,7 @@ namespace VdarApi.Controllers
                 )
                 return new RegistrationResult(901);
 
-            var user = await _userRP.GetUserByPhoneAsync(model.Phone);
+            var user = await _repo.User.GetUserByPhoneAsync(model.Phone);
 
             if (user == null)
                 return new RegistrationResult(905);
@@ -94,11 +94,18 @@ namespace VdarApi.Controllers
                 KeyType = "SMS"
             };
 
-            if (!await _confirmationRP.CheckConfirmationKeyAsync(key))
+            if (!await _repo.ConfirmationKey.CheckConfirmationKeyAsync(key))
                 return new RegistrationResult(904);
 
-            await _userRP.SetConfirmationPhoneAsync(user);
-            await _confirmationRP.RemoveConfirmationKeysAsync(key);
+            user.ActivatedDateUtc = DateTime.UtcNow;
+            user.PhoneIsConfirmed = true;
+            user.IsActive = true;
+
+            _repo.User.Update(user);
+            await _repo.User.SaveAsync();
+
+            _repo.ConfirmationKey.RemoveNotActualKeys(key);
+            await _repo.ConfirmationKey.SaveAsync();
 
             return new RegistrationResult(999);
         }
@@ -110,19 +117,21 @@ namespace VdarApi.Controllers
                )
                 return new RegistrationResult(901);
 
-            var user = await _userRP.GetUserByPhoneAsync(model.Login);
+            var user = await _repo.User.GetUserByPhoneAsync(model.Login);
 
             if (user == null)
                 return new RegistrationResult(905);
 
-            await _confirmationRP.InsertConfirmationKeyAsync(new ConfirmationKey()
+            ConfirmationKey key = new ConfirmationKey()
             {
                 UserId = user.Id,
                 Key = "1234",
                 KeyType = "recovery.SMS",
                 CreatedDateUTC = DateTime.UtcNow,
                 ExpireDateUTC = DateTime.UtcNow.AddHours(1)
-            });
+            };
+            _repo.ConfirmationKey.Create(key);
+            await _repo.ConfirmationKey.SaveAsync();
 
             return new RegistrationResult(999);
         }
@@ -136,12 +145,12 @@ namespace VdarApi.Controllers
               )
                 return new RegistrationResult(901);
 
-            var user = await _userRP.GetUserByPhoneAsync(model.Login);
+            var user = await _repo.User.GetUserByPhoneAsync(model.Login);
 
             if (user == null)
                 return new RegistrationResult(905);
 
-            var confirmation = await _confirmationRP.GetConfirmationAsync(new ConfirmationKey()
+            var confirmation = await _repo.ConfirmationKey.EnterConfirmationAsync(new ConfirmationKey()
             {
                 UserId = user.Id,
                 Key = model.SecurityKey,
@@ -152,7 +161,8 @@ namespace VdarApi.Controllers
                 return new RegistrationResult(906);
 
             confirmation.HashCode = confirmation.GetHashCode().ToString();
-            await _confirmationRP.SetHashCodeAsync(confirmation);
+            _repo.ConfirmationKey.Update(confirmation);
+            await _repo.ConfirmationKey.SaveAsync();
 
 
             return new RegistrationResult(999, new {hash = confirmation.HashCode });

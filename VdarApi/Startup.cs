@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using VdarApi.Extensions;
 using VdarApi.Models;
 using VdarApi.Repositories;
 
@@ -35,10 +36,7 @@ namespace VdarApi
             services.AddDbContext<VdarDbContext>(options =>
                 options.UseSqlServer(connection));
 
-            //Внедрение зависимости, взаимодействие с БД
-            services.AddScoped<IRTokenRepository, RTokenRepository>();
-            services.AddScoped<IRUserRepository, RUserRepository>();
-            services.AddScoped<IRConfirmationRepository, RConfirmationRepository>();
+            services.ConfigureRepositoryWrapper();
 
             //Подключение кроссдоменных запросов
             services.AddCors();

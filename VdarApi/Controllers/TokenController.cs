@@ -12,6 +12,7 @@ using VdarApi.Repositories;
 using Newtonsoft.Json;
 using VdarApi.Models;
 using Microsoft.IdentityModel.Tokens;
+using VdarApi.Contracts;
 
 namespace VdarApi.Controllers
 {
@@ -19,13 +20,11 @@ namespace VdarApi.Controllers
     [ApiController]
     public class TokenController : ControllerBase
     {
-        private IRTokenRepository _tokenRP;
-        private IRUserRepository _userRP;
+        private IRepositoryWrapper _repo;
 
-        public TokenController(IRTokenRepository tokenRepository, IRUserRepository userRepository)
+        public TokenController(IRepositoryWrapper wrapperRepository)
         {
-            this._tokenRP = tokenRepository;
-            this._userRP = userRepository;
+            this._repo = wrapperRepository;
         }
 
         [HttpPost]
@@ -51,14 +50,18 @@ namespace VdarApi.Controllers
 
         private async Task<TokenResult> DoAuthenticationAsync(Parameters parameters)
         {
-            User _user = await _userRP.LoginUserAsync(parameters.username, parameters.password);
+            var _user = await _repo.User.LoginUserAsync(parameters.username, parameters.password);
             
             if (_user == null)
                 return new TokenResult(904);
 
             // Удаляем токен пользователя (в разрезе браузера), на случай если он украден
-            await _tokenRP.RemoveTokenAsync(_user.Id, parameters.finger_print??"");
-
+            var notActualTokens = await _repo.Token.GetFailedTokensAsync(_user.Id, parameters.finger_print ?? "");
+            if (notActualTokens.Count() > 0)
+            {
+                _repo.Token.Delete(notActualTokens);
+                await _repo.Token.SaveAsync();
+            }
             //Формируем новый токен
             var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
             var token = new Tokens
@@ -76,7 +79,8 @@ namespace VdarApi.Controllers
             };
 
             //Добавляем токен в таблицу БД
-            await _tokenRP.AddTokenAsync(token);
+             _repo.Token.Create(token);
+            await _repo.Token.SaveAsync();
 
             return new TokenResult(999, new
                 {
@@ -88,7 +92,7 @@ namespace VdarApi.Controllers
         private async Task<TokenResult> DoRefreshTokenAsync(Parameters parameters)
         {
             string access_token = ControllerContext.HttpContext.Request.Headers["Authorization"].ToString().Split(' ')[1];
-            var token = await _tokenRP.GetTokenAsync(parameters.finger_print ?? "", access_token, parameters.refresh_token);
+            var token = await _repo.Token.GetTokenAsync(parameters.finger_print ?? "", access_token, parameters.refresh_token);
 
             if (token == null)
                 return new TokenResult(906);
@@ -109,7 +113,7 @@ namespace VdarApi.Controllers
             else
             {
                 //подтягиваем данные из БД
-                _user = await _userRP.GetUserAsync(_user.Id);
+                _user = await _repo.User.GetUserByIdAsync(_user.Id);
 
                 if (_user == null)
                     return new TokenResult(904);
@@ -123,7 +127,8 @@ namespace VdarApi.Controllers
             token.IP = parameters.ip;
             token.UserAgent = parameters.user_agent;
 
-            await _tokenRP.RefreshTokenAsync(token);
+             _repo.Token.Update(token);
+            await _repo.Token.SaveAsync();
 
             return new TokenResult(999, new
                 {
