@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using VdarApi.Contracts;
 using VdarApi.Models;
 using VdarApi.Repositories;
+using VdarApi.Services;
 using VdarApi.ViewModels;
 
 namespace VdarApi.Controllers
@@ -16,10 +17,12 @@ namespace VdarApi.Controllers
     public class AccountController : ControllerBase
     {
         private IRepositoryWrapper _repo;
+        private ITokenGenerator tokenGenerator;
 
-        public AccountController(IRepositoryWrapper wrapperRepository)
+        public AccountController(IRepositoryWrapper wrapperRepository, ITokenGenerator tokenGenerator)
         {
             this._repo = wrapperRepository;
+            this.tokenGenerator = tokenGenerator;
         }
 
         [HttpPost]
@@ -107,7 +110,13 @@ namespace VdarApi.Controllers
             _repo.ConfirmationKey.RemoveNotActualKeys(key);
             await _repo.ConfirmationKey.SaveAsync();
 
-            return new RegistrationResult(999);
+            var token = await tokenGenerator.GenerateJWTTokenAsync(user, _repo.Token, (ClientParameters)model);
+
+            return new RegistrationResult(999, new
+            {
+                access_token = token.AccessToken,
+                refresh_token = token.RefreshToken
+            });
         }
 
         [HttpPost("/recovery/phone")]

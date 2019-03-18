@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace VdarApi.ViewModels
 {
-    public class RegistrationViewModel
+    public class RegistrationViewModel : ClientParameters
     {
 
         public string Phone { get; set; }

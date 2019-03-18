@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using VdarApi.Contracts;
 using VdarApi.Models;
 using VdarApi.Repositories;
+using VdarApi.Services;
 
 namespace VdarApi.Extensions
 {
@@ -21,9 +22,10 @@ namespace VdarApi.Extensions
                 options.UseSqlServer(connection));
         }
 
-        public static void ConfigureRepositoryWrapper(this IServiceCollection services)
+        public static void ConfigureDI(this IServiceCollection services)
         {
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
+            services.AddTransient<ITokenGenerator, TokenGenerator>();
         }
 
         public static void ConfigureCors(this IServiceCollection services)

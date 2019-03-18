@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using VdarApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using VdarApi.Contracts;
+using VdarApi.Services;
 
 namespace VdarApi.Controllers
 {
@@ -21,10 +22,12 @@ namespace VdarApi.Controllers
     public class TokenController : ControllerBase
     {
         private IRepositoryWrapper _repo;
+        private ITokenGenerator tokenGenerator;
 
-        public TokenController(IRepositoryWrapper wrapperRepository)
+        public TokenController(IRepositoryWrapper wrapperRepository, ITokenGenerator tokenGenerator)
         {
             this._repo = wrapperRepository;
+            this.tokenGenerator = tokenGenerator;
         }
 
         [HttpPost]
@@ -55,32 +58,7 @@ namespace VdarApi.Controllers
             if (_user == null)
                 return new TokenResult(904);
 
-            // Удаляем токен пользователя (в разрезе браузера), на случай если он украден
-            var notActualTokens = await _repo.Token.GetFailedTokensAsync(_user.Id, parameters.finger_print ?? "");
-            if (notActualTokens.Count() > 0)
-            {
-                _repo.Token.Delete(notActualTokens);
-                await _repo.Token.SaveAsync();
-            }
-            //Формируем новый токен
-            var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
-            var token = new Tokens
-            {
-                ClientId = _user.Id,
-                AccessToken = GetJwt(_user, _user.GetHashCode().ToString()),
-                RefreshToken = refresh_token,
-                UpdateHashSum = _user.GetHashCode().ToString(),
-                FingerPrint = parameters.finger_print??"",
-                LastRefreshDateUTC = DateTime.UtcNow,
-                CreatedDateUTC = DateTime.UtcNow,
-                UserAgent = parameters.user_agent,
-                Location = parameters.location,
-                IP = parameters.ip
-            };
-
-            //Добавляем токен в таблицу БД
-             _repo.Token.Create(token);
-            await _repo.Token.SaveAsync();
+            var token = await tokenGenerator.GenerateJWTTokenAsync(_user, _repo.Token, (ClientParameters)parameters);
 
             return new TokenResult(999, new
                 {
@@ -122,7 +100,7 @@ namespace VdarApi.Controllers
             }
 
             token.LastRefreshDateUTC = DateTime.UtcNow;
-            token.AccessToken = GetJwt(_user, claims_hash);
+            token.AccessToken = tokenGenerator.GetJWT(_user, claims_hash);
             token.Location = parameters.location;
             token.IP = parameters.ip;
             token.UserAgent = parameters.user_agent;
@@ -136,30 +114,6 @@ namespace VdarApi.Controllers
                     refresh_token = token.RefreshToken
                 });
             
-        }
-
-
-        private string GetJwt(User info, string clientHash)
-        {
-            var now = DateTime.UtcNow;
-
-            var claims = new Claim[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, info.Id.ToString()),
-                new Claim(ClaimsIdentity.DefaultNameClaimType, info.Name),
-                new Claim(ClaimTypes.Hash, clientHash)
-            };
-
-            var jwt = new JwtSecurityToken(
-                    issuer: AuthOptions.ISSUER,
-                    audience: AuthOptions.AUDIENCE,
-                    notBefore: now,
-                    claims: claims,
-                    expires: now.Add(TimeSpan.FromSeconds(AuthOptions.LIFETIME)),
-                    signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            return encodedJwt;
         }
 
     }

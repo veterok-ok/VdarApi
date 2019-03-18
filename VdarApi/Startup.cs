@@ -32,7 +32,7 @@ namespace VdarApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.ConfigureDatabase(Configuration.GetConnectionString("DefaultConnection"));
-            services.ConfigureRepositoryWrapper();
+            services.ConfigureDI();
             services.ConfigureCors();
             services.ConfigureAuthentication();
 
