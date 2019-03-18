@@ -75,23 +75,14 @@ namespace VdarApi.Controllers
             if (token == null)
                 return new TokenResult(906);
 
-            User _user = new User()
-            {
-                Id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))
-            };
-
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             string claims_hash = User.FindFirstValue(ClaimTypes.Hash);
 
-
-            if (token.UpdateHashSum.Equals(claims_hash))
-            {
-                //подтягиваем данные из существующего JWT
-                _user.Name = User.FindFirstValue(ClaimsIdentity.DefaultNameClaimType);
-            }
-            else
+            User _user = null;
+            if (!token.UpdateHashSum.Equals(claims_hash))
             {
                 //подтягиваем данные из БД
-                _user = await _repo.User.GetUserByIdAsync(_user.Id);
+                _user = await _repo.User.GetUserByIdAsync(userId);
 
                 if (_user == null)
                     return new TokenResult(904);
@@ -100,7 +91,7 @@ namespace VdarApi.Controllers
             }
 
             token.LastRefreshDateUTC = DateTime.UtcNow;
-            token.AccessToken = tokenGenerator.GetJWT(_user, claims_hash);
+            token.AccessToken = tokenGenerator.GetJWT(_user, claims_hash, User.Claims);
             token.Location = parameters.location;
             token.IP = parameters.ip;
             token.UserAgent = parameters.user_agent;

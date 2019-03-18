@@ -45,16 +45,16 @@ namespace VdarApi.Services
             return token;
         }
 
-        public string GetJWT(User user, string userHash)
+        public string GetJWT(User user, string userHash, IEnumerable<Claim> claims = null)
         {
             var now = DateTime.UtcNow;
-
-            var claims = new Claim[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimsIdentity.DefaultNameClaimType, user.Name?? ""),
-                new Claim(ClaimTypes.Hash, userHash)
-            };
+            if (claims == null)
+                claims = new Claim[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim("isEmptyProfile", IsEmptyProfile(user).ToString()),
+                    new Claim(ClaimTypes.Hash, userHash)
+                };
 
             var jwt = new JwtSecurityToken(
                     issuer: AuthOptions.ISSUER,
@@ -67,5 +67,13 @@ namespace VdarApi.Services
 
             return encodedJwt;
         }
+
+        private bool IsEmptyProfile(User user)
+        {
+            return String.IsNullOrEmpty(user.Name) ||
+                   String.IsNullOrEmpty(user.SurName) ||
+                   user.Birthday == null;
+        }
+
     }
 }
