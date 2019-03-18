@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VdarApi.Contracts;
+using VdarApi.Helpers;
 using VdarApi.Models;
 using VdarApi.Repositories;
 using VdarApi.Services;
@@ -39,23 +40,28 @@ namespace VdarApi.Controllers
             if (user != null && user.PhoneIsConfirmed)
                 return new RegistrationResult(902);
 
+            var salt = SecurePasswordHasherHelper.GenerateSalt();
+            var hash = SecurePasswordHasherHelper.Hash(model.Password, salt);
+
             if (user == null) {
                 user = new User()
                 {
-                    Password = model.Password,
+                    Password = hash,
+                    Salt = salt,
                     PhoneNumber = model.Phone,
                     PhoneIsConfirmed = false,
                     CreatedDateUtc = DateTime.UtcNow
                 };
                 _repo.User.Create(user);
+                await _repo.User.SaveAsync();
             }
-            else if (!user.Password.Equals(model.Password))
+            else if (!SecurePasswordHasherHelper.Validate(model.Password, user.Salt, user.Password))
             {
-                user.Password = model.Password;
+                user.Password = hash;
+                user.Salt = salt;
                 _repo.User.Update(user);
+                await _repo.User.SaveAsync();
             }
-
-            await _repo.User.SaveAsync();
 
             if (await _repo.ConfirmationKey.GetCountAttemptConfirmationAsync(user.Id, "SMS") > 2)
                 return new RegistrationResult(903);

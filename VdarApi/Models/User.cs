@@ -26,6 +26,8 @@ namespace VdarApi.Models
         [Required]
         public string Password { get; set; }
 
+        public string Salt { get; set; }
+
         [Required]
         public string PhoneNumber { get; set; }
 

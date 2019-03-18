@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using VdarApi.Helpers;
 
 namespace VdarApi.Models
 {
@@ -23,10 +24,13 @@ namespace VdarApi.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            string _salt = SecurePasswordHasherHelper.GenerateSalt();
+            string _salt2 = SecurePasswordHasherHelper.GenerateSalt();
             User[] users = new User[]{
                 new User {
                     Id = 1,
-                    Password = "123",
+                    Password = SecurePasswordHasherHelper.Hash("123", _salt),
+                    Salt = _salt,
                     Name = "Viktor",
                     SurName = "Bochikalov",
                     FathersName = "Andreevich",
@@ -42,7 +46,8 @@ namespace VdarApi.Models
                 },
                 new User {
                     Id = 2,
-                    Password = "123",
+                    Password = SecurePasswordHasherHelper.Hash("123", _salt2),
+                    Salt = _salt2,
                     Name = "Levon",
                     SurName = "Kukuyan",
                     PhoneNumber = "7771940504",

@@ -60,6 +60,7 @@ namespace VdarApi.Migrations
                     FathersName = table.Column<string>(nullable: true),
                     Birthday = table.Column<DateTime>(nullable: true),
                     Password = table.Column<string>(nullable: false),
+                    Salt = table.Column<string>(nullable: true),
                     PhoneNumber = table.Column<string>(nullable: false),
                     PhoneIsConfirmed = table.Column<bool>(nullable: false),
                     Email = table.Column<string>(nullable: true),
@@ -75,13 +76,13 @@ namespace VdarApi.Migrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "ActivatedDateUtc", "Birthday", "CreatedDateUtc", "Email", "EmailIsConfirmed", "FathersName", "IsActive", "Login", "Name", "Password", "PhoneIsConfirmed", "PhoneNumber", "SurName" },
-                values: new object[] { 1, new DateTime(2019, 3, 2, 4, 1, 9, 837, DateTimeKind.Utc), new DateTime(1992, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2019, 3, 16, 4, 45, 21, 837, DateTimeKind.Utc), "admin@google.com", false, "Andreevich", true, "vektor", "Viktor", "123", true, "7771291221", "Bochikalov" });
+                columns: new[] { "Id", "ActivatedDateUtc", "Birthday", "CreatedDateUtc", "Email", "EmailIsConfirmed", "FathersName", "IsActive", "Login", "Name", "Password", "PhoneIsConfirmed", "PhoneNumber", "Salt", "SurName" },
+                values: new object[] { 1, new DateTime(2019, 3, 4, 13, 45, 5, 49, DateTimeKind.Utc), new DateTime(1992, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2019, 3, 18, 14, 29, 17, 50, DateTimeKind.Utc), "admin@google.com", false, "Andreevich", true, "vektor", "Viktor", "lfuE/oWQJUzSUEkr2UGDEYL4F2bTbi0erSBlD3EsDuk=", true, "7771291221", "PYOe1yaW+qQrkz2LzVd7rg==", "Bochikalov" });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "ActivatedDateUtc", "Birthday", "CreatedDateUtc", "Email", "EmailIsConfirmed", "FathersName", "IsActive", "Login", "Name", "Password", "PhoneIsConfirmed", "PhoneNumber", "SurName" },
-                values: new object[] { 2, null, null, new DateTime(2019, 3, 16, 4, 45, 21, 838, DateTimeKind.Utc), null, false, null, true, null, "Levon", "123", false, "7771940504", "Kukuyan" });
+                columns: new[] { "Id", "ActivatedDateUtc", "Birthday", "CreatedDateUtc", "Email", "EmailIsConfirmed", "FathersName", "IsActive", "Login", "Name", "Password", "PhoneIsConfirmed", "PhoneNumber", "Salt", "SurName" },
+                values: new object[] { 2, null, null, new DateTime(2019, 3, 18, 14, 29, 17, 51, DateTimeKind.Utc), null, false, null, true, null, "Levon", "5I6AO1tI9shyjUpW98m9IjdNqS9Y2nob/YTfoJv1dXw=", false, "7771940504", "0EJ72/or8TA+K8usgviNsg==", "Kukuyan" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

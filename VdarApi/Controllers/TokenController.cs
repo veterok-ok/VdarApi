@@ -14,6 +14,7 @@ using VdarApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using VdarApi.Contracts;
 using VdarApi.Services;
+using VdarApi.Helpers;
 
 namespace VdarApi.Controllers
 {
@@ -54,8 +55,8 @@ namespace VdarApi.Controllers
         private async Task<TokenResult> DoAuthenticationAsync(Parameters parameters)
         {
             var _user = await _repo.User.LoginUserAsync(parameters.username, parameters.password);
-            
-            if (_user == null)
+
+            if (_user == null || !SecurePasswordHasherHelper.Validate(parameters.password, _user.Salt, _user.Password))
                 return new TokenResult(904);
 
             var token = await tokenGenerator.GenerateJWTTokenAsync(_user, _repo.Token, (ClientParameters)parameters);

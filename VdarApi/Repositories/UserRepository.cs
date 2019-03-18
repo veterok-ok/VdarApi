@@ -22,7 +22,7 @@ namespace VdarApi.Repositories
 
         async public Task<User> LoginUserAsync(string login, string password) =>
             await RepositoryContext.Users.SingleOrDefaultAsync(u =>
-                u.Password.Equals(password) &&
+                //u.Password.Equals( password) &&
                              (
                                 u.Login.Equals(login) ||
                                 u.Email.Equals(login) ||
