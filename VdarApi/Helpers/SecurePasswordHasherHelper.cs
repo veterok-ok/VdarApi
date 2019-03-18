@@ -7,10 +7,7 @@ namespace VdarApi.Helpers
 {
     public sealed class SecurePasswordHasherHelper
     {
-        private const int SaltSize = 16;
-        private const int HashSize = 20;
-        private const int iterations = 1000;
-
+        
         public static bool Validate(string password, string salt, string hash)
             => Hash(password, salt) == hash;
 
@@ -20,7 +17,7 @@ namespace VdarApi.Helpers
                                 password: password,
                                 salt: Encoding.UTF8.GetBytes(salt),
                                 prf: KeyDerivationPrf.HMACSHA512,
-                                iterationCount: iterations,
+                                iterationCount: 1000,
                                 numBytesRequested: 256 / 8);
 
             return Convert.ToBase64String(valueBytes);
