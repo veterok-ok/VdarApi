@@ -59,7 +59,7 @@ namespace VdarApi.Controllers
             if (_user == null || !SecurePasswordHasherHelper.Validate(parameters.password, _user.Salt, _user.Password))
                 return new TokenResult(904);
 
-            var token = await tokenGenerator.GenerateJWTTokenAsync(_user, _repo.Token, (ClientParameters)parameters);
+            var token = await tokenGenerator.GenerateJWTTokenAsync(_user, (ClientParameters)parameters);
 
             return new TokenResult(999, new
                 {

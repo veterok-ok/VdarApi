@@ -13,14 +13,21 @@ namespace VdarApi.Services
 {
     public class TokenGenerator : ITokenGenerator
     {
-        async public Task<Tokens> GenerateJWTTokenAsync(User user, ITokenRepository _repo, ClientParameters parameters)
+        private IRepositoryWrapper _repo;
+
+        public TokenGenerator(IRepositoryWrapper wrapperRepository)
+        {
+            _repo = wrapperRepository;
+        }
+
+        async public Task<Tokens> GenerateJWTTokenAsync(User user, ClientParameters parameters)
         {
             // Удаляем токен пользователя (в разрезе браузера), на случай если он украден
-            var notActualTokens = await _repo.GetFailedTokensAsync(user.Id, parameters.finger_print ?? "");
+            var notActualTokens = await _repo.Token.GetFailedTokensAsync(user.Id, parameters.finger_print ?? "");
             if (notActualTokens.Count() > 0)
             {
-                _repo.Delete(notActualTokens);
-                await _repo.SaveAsync();
+                _repo.Token.Delete(notActualTokens);
+                await _repo.Token.SaveAsync();
             }
             //Формируем новый токен
             var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
@@ -39,8 +46,8 @@ namespace VdarApi.Services
             };
 
             //Добавляем токен в таблицу БД
-            _repo.Create(token);
-            await _repo.SaveAsync();
+            _repo.Token.Create(token);
+            await _repo.Token.SaveAsync();
 
             return token;
         }

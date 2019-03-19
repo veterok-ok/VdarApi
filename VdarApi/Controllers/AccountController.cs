@@ -116,7 +116,7 @@ namespace VdarApi.Controllers
             _repo.ConfirmationKey.RemoveNotActualKeys(key);
             await _repo.ConfirmationKey.SaveAsync();
 
-            var token = await tokenGenerator.GenerateJWTTokenAsync(user, _repo.Token, (ClientParameters)model);
+            var token = await tokenGenerator.GenerateJWTTokenAsync(user, (ClientParameters)model);
 
             return new RegistrationResult(999, new
             {
