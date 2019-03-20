@@ -56,6 +56,8 @@ namespace VdarApi
 
             app.UseAuthentication();
 
+            app.ConfigureExceptionHandler();
+
             //app.UseStaticFiles();
 
             //app.UseHttpsRedirection();
