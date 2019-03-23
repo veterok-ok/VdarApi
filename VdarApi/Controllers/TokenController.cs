@@ -1,20 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Entities.Models;
+using Entities.RequestModels;
+using Entities.ResponseModels;
+using Contracts;
+using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using VdarApi.ViewModels;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
-using VdarApi.Repositories;
-using Newtonsoft.Json;
-using VdarApi.Models;
-using Microsoft.IdentityModel.Tokens;
-using VdarApi.Contracts;
-using VdarApi.Services;
-using VdarApi.Helpers;
+using Helpers.Security;
 
 namespace VdarApi.Controllers
 {

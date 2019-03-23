@@ -1,13 +1,12 @@
 ﻿using Contracts;
+using Entities;
 using LoggerService;
+using Repository;
+using TokenService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using VdarApi.Contracts;
-using VdarApi.Models;
-using VdarApi.Repositories;
-using VdarApi.Services;
 
 namespace VdarApi.Extensions
 {
@@ -16,12 +15,15 @@ namespace VdarApi.Extensions
         public static void ConfigureDatabase(this IServiceCollection services, string connection)
         {
             services.AddDbContext<VdarDbContext>(options =>
-                options.UseSqlServer(connection));
+                options.UseSqlServer(connection, b =>  b.MigrationsAssembly("VdarApi")));
         }
 
-        public static void ConfigureDI(this IServiceCollection services)
+        public static void ConfigureRepository(this IServiceCollection services)
         {
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
+        }
+        public static void ConfigureTokenService(this IServiceCollection services)
+        {
             services.AddTransient<ITokenGenerator, TokenGenerator>();
         }
 

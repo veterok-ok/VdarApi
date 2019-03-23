@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Contracts;
+using Entities.Models;
+using Entities.RequestModels;
+using Entities.ResponseModels;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using VdarApi.Contracts;
-using VdarApi.Helpers;
-using VdarApi.Models;
-using VdarApi.Services;
-using VdarApi.ViewModels;
-using Contracts;
+using Helpers.Security;
 
 namespace VdarApi.Controllers
 {

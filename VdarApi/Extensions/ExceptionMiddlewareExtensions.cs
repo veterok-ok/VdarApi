@@ -1,9 +1,9 @@
 ﻿using Contracts;
+using Entities.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using System.Net;
-using VdarApi.Models;
 
 namespace VdarApi.Extensions
 {

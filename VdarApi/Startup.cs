@@ -26,7 +26,8 @@ namespace VdarApi
         {
             services.ConfigureLoggerService();
             services.ConfigureDatabase(Configuration.GetConnectionString("DefaultConnection"));
-            services.ConfigureDI();
+            services.ConfigureRepository();
+            services.ConfigureTokenService();
             services.ConfigureCors();
             services.ConfigureAuthentication();
 
