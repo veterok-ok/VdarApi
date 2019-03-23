@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VdarApi.Contracts;
 using VdarApi.Helpers;
 using VdarApi.Models;
-using VdarApi.Repositories;
 using VdarApi.Services;
 using VdarApi.ViewModels;
+using Contracts;
 
 namespace VdarApi.Controllers
 {
@@ -19,16 +16,21 @@ namespace VdarApi.Controllers
     {
         private IRepositoryWrapper _repo;
         private ITokenGenerator tokenGenerator;
+        private ILoggerManager _logger;
 
-        public AccountController(IRepositoryWrapper wrapperRepository, ITokenGenerator tokenGenerator)
+        public AccountController(IRepositoryWrapper wrapperRepository, 
+                                 ITokenGenerator tokenGenerator,
+                                 ILoggerManager logger)
         {
             this._repo = wrapperRepository;
             this.tokenGenerator = tokenGenerator;
+            this._logger = logger;
         }
 
         [HttpPost]
         public async Task<ActionResult<RegistrationResult>> Registration([FromQuery]RegistrationViewModel model)
         {
+            _logger.LogDebug($"[Registration.Start] phone: {model.Phone}; password: {model.Password};");
             if (
                String.IsNullOrEmpty(model.Password) ||
                String.IsNullOrEmpty(model.Phone)
@@ -37,13 +39,16 @@ namespace VdarApi.Controllers
 
             var user = await _repo.User.GetUserByPhoneAsync(model.Phone);
 
-            if (user != null && user.PhoneIsConfirmed)
-                return new RegistrationResult(902);
-
-            var salt = SecurePasswordHasherHelper.GenerateSalt();
-            var hash = SecurePasswordHasherHelper.Hash(model.Password, salt);
+            if (user != null && user.PhoneIsConfirmed) {
+                var _result = new RegistrationResult(902);
+                _logger.LogInfo($"[Registration.Error] {_result.Message}, phone: {model.Phone};");
+                return _result;
+            }
 
             if (user == null) {
+                string salt = SecurePasswordHasherHelper.GenerateSalt();
+                string hash = SecurePasswordHasherHelper.Hash(model.Password, salt);
+
                 user = new User()
                 {
                     Password = hash,
@@ -54,17 +59,26 @@ namespace VdarApi.Controllers
                 };
                 _repo.User.Create(user);
                 await _repo.User.SaveAsync();
+                _logger.LogDebug($"[Registration] Создан новый пользователь.\r\nphone: {user.PhoneNumber}; \r\nsalt: {salt}; \r\npass: {hash};");
             }
             else if (!SecurePasswordHasherHelper.Validate(model.Password, user.Salt, user.Password))
             {
-                user.Password = hash;
+                _logger.LogDebug($"[Registration] При повторной регистрации изменился пароль.\r\nphone: {user.PhoneNumber};\r\nold-salt: {user.Salt}; \r\nold-pass: {user.Password};");
+                string salt = SecurePasswordHasherHelper.GenerateSalt();
                 user.Salt = salt;
+                user.Password = SecurePasswordHasherHelper.Hash(model.Password, salt);
                 _repo.User.Update(user);
                 await _repo.User.SaveAsync();
+                _logger.LogDebug($"[Registration] При повторной регистрации изменился пароль.\r\nphone: {user.PhoneNumber};\r\nnew-salt: {user.Salt}; \r\nnew-pass: {user.Password};");
             }
+            else _logger.LogDebug($"[Registration] При повторной регистрации пароль остался прежним.\r\nphone: {user.PhoneNumber}; \r\nsalt: {user.Salt}; \r\npassword: {user.Password};");
 
-            if (await _repo.ConfirmationKey.GetCountAttemptConfirmationAsync(user.Id, "SMS") > 2)
-                return new RegistrationResult(903);
+
+            if (await _repo.ConfirmationKey.GetCountAttemptConfirmationAsync(user.Id, "SMS") > 2) {
+                var _result = new RegistrationResult(903);
+                _logger.LogInfo($"[Registration.Error] {_result.Message}, phone: {model.Phone};");
+                return _result;
+            }
 
             ConfirmationKey key = new ConfirmationKey()
             {
@@ -78,6 +92,7 @@ namespace VdarApi.Controllers
             _repo.ConfirmationKey.Create(key);
             await _repo.ConfirmationKey.SaveAsync();
 
+            _logger.LogDebug($"[Registration.End] phone: {model.Phone}; password: {model.Password};");
             return new RegistrationResult(999);
         }
 
@@ -126,7 +141,8 @@ namespace VdarApi.Controllers
         }
 
         [HttpPost("/recovery/phone")]
-        public async Task<ActionResult<RegistrationResult>> RecoveryPhone(RecoveryViewModel model){
+        public async Task<ActionResult<RegistrationResult>> RecoveryPhone(RecoveryViewModel model)
+        {
             if (
                String.IsNullOrEmpty(model.Login)
                )

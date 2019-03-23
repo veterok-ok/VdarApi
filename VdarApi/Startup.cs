@@ -1,21 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using VdarApi.Extensions;
-using VdarApi.Models;
-using VdarApi.Repositories;
+using NLog;
+using Contracts;
 
 namespace VdarApi
 {
@@ -23,6 +15,7 @@ namespace VdarApi
     {
         public Startup(IConfiguration configuration)
         {
+            LogManager.LoadConfiguration(String.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
             Configuration = configuration;
         }
         
@@ -31,6 +24,7 @@ namespace VdarApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.ConfigureLoggerService();
             services.ConfigureDatabase(Configuration.GetConnectionString("DefaultConnection"));
             services.ConfigureDI();
             services.ConfigureCors();
@@ -40,7 +34,7 @@ namespace VdarApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerManager logger)
         {
             
             if (env.IsDevelopment())
@@ -56,7 +50,7 @@ namespace VdarApi
 
             app.UseAuthentication();
 
-            app.ConfigureExceptionHandler();
+            app.ConfigureExceptionHandler(logger);
 
             //app.UseStaticFiles();
 

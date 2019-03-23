@@ -32,7 +32,8 @@ namespace VdarApi.Repositories
 
         async public Task<int> GetCountAttemptConfirmationAsync(int userId, string confirmationType) =>
             await RepositoryContext.ConfirmationKeys.AsNoTracking().CountAsync(c =>
-                 c.KeyType.Equals(confirmationType, StringComparison.CurrentCultureIgnoreCase));
+                 c.KeyType.Equals(confirmationType, StringComparison.CurrentCultureIgnoreCase) &&
+                 c.UserId.Equals(userId));
 
         public void RemoveNotActualKeys(ConfirmationKey key)
         {
