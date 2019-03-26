@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Contracts
+namespace Contracts.Repository
 {
     public interface ITokenRepository: IRepositoryBase<Tokens>
     {

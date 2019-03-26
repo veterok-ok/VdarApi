@@ -1,4 +1,5 @@
 ﻿using Contracts;
+using Contracts.Repository;
 using Entities;
 using LoggerService;
 using Repository;

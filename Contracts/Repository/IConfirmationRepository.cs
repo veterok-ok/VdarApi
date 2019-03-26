@@ -1,7 +1,7 @@
 ﻿using Entities.Models;
 using System.Threading.Tasks;
 
-namespace Contracts
+namespace Contracts.Repository
 {
     public interface IConfirmationRepository: IRepositoryBase<ConfirmationKey>
     {

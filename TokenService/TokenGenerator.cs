@@ -1,4 +1,5 @@
-﻿using Contracts;
+﻿using Contracts.Repository;
+using Contracts;
 using Entities.Models;
 using Microsoft.IdentityModel.Tokens;
 using System;

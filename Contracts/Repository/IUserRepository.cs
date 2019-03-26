@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Entities.Models;
 
-namespace Contracts
+namespace Contracts.Repository
 {
     public interface IUserRepository : IRepositoryBase<User>
     {

@@ -1,4 +1,5 @@
 ﻿using Contracts;
+using Contracts.Repository;
 using Entities.Models;
 using Entities.RequestModels;
 using Entities.ResponseModels;

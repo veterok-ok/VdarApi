@@ -2,6 +2,7 @@
 using Entities.RequestModels;
 using Entities.ResponseModels;
 using Contracts;
+using Contracts.Repository;
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
