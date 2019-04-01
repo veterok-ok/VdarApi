@@ -140,8 +140,7 @@ namespace VdarApi.Controllers
             });
         }
 
-        [HttpPost("/recovery/phone")]
-        public async Task<ActionResult<RegistrationResult>> RecoveryPhone(RecoveryViewModel model)
+        public async Task<ActionResult<RegistrationResult>> RecoveryPhone([FromQuery]RecoveryViewModel model)
         {
             if (
                String.IsNullOrEmpty(model.Login)
@@ -167,8 +166,7 @@ namespace VdarApi.Controllers
             return new RegistrationResult(999);
         }
 
-        [HttpPost("/recovery/phone/confirm")]
-        public async Task<ActionResult<RegistrationResult>> RecoveryPhoneConfirm(RecoveryViewModel model)
+        public async Task<ActionResult<RegistrationResult>> RecoveryPhoneConfirm([FromQuery]RecoveryViewModel model)
         {
             if (
               String.IsNullOrEmpty(model.Login) || 
@@ -191,14 +189,37 @@ namespace VdarApi.Controllers
             if (confirmation == null)
                 return new RegistrationResult(906);
 
-            confirmation.HashCode = confirmation.GetHashCode().ToString();
+            confirmation.HashCode = SecureCryptoGenerator.GenerateRecoveryUri();
             _repo.ConfirmationKey.Update(confirmation);
             await _repo.ConfirmationKey.SaveAsync();
 
 
-            return new RegistrationResult(999, new {hash = confirmation.HashCode });
+            return new RegistrationResult(999, new { hash = Uri.EscapeDataString(confirmation.HashCode) });
         }
 
+        public async Task<ActionResult<RegistrationResult>> RecoveryChangePassword([FromQuery]RecoveryChangePassword model)
+        {
+            if (String.IsNullOrEmpty(model.Uri) ||
+                String.IsNullOrEmpty(model.Password) ||
+                String.IsNullOrEmpty(model.ConfirmPassword)
+                )
+                return new RegistrationResult(901);
+
+            var confirmation = await _repo.ConfirmationKey.GetByUri(model.Uri);
+
+            if (confirmation == null)
+                return new RegistrationResult(906);
+
+            var user = await _repo.User.GetUserByIdAsync(confirmation.Id);
+
+            string salt = SecurePasswordHasherHelper.GenerateSalt();
+            user.Salt = salt;
+            user.Password = SecurePasswordHasherHelper.Hash(model.Password, salt);
+            _repo.User.Update(user);
+            await _repo.User.SaveAsync();
+
+            return new RegistrationResult(999);
+        }
 
     }
 }

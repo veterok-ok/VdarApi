@@ -25,10 +25,15 @@ namespace Repository
                 );
 
         async public Task<ConfirmationKey> EnterConfirmationAsync(ConfirmationKey key) =>
-            await RepositoryContext.ConfirmationKeys.SingleOrDefaultAsync(c =>
+            await RepositoryContext.ConfirmationKeys.FirstOrDefaultAsync(c =>
                    c.KeyType.Equals(key.KeyType, StringComparison.CurrentCultureIgnoreCase) &&
                    c.UserId.Equals(key.UserId) &&
                    c.Key.Equals(key.Key)
+                );
+
+        async public Task<ConfirmationKey> GetByUri(string uri) =>
+            await RepositoryContext.ConfirmationKeys.SingleOrDefaultAsync(c =>
+                   c.HashCode.Equals(uri)
                 );
 
         async public Task<int> GetCountAttemptConfirmationAsync(int userId, string confirmationType) =>
