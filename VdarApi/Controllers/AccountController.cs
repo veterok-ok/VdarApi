@@ -166,6 +166,37 @@ namespace VdarApi.Controllers
             return new RegistrationResult(999);
         }
 
+        public async Task<ActionResult<RegistrationResult>> RecoveryEmail([FromQuery]RecoveryViewModel model)
+        {
+            if (
+               String.IsNullOrEmpty(model.Login)
+               )
+                return new RegistrationResult(901);
+
+            var user = await _repo.User.GetUserByEmailAsync(model.Login);
+
+            if (user == null)
+                return new RegistrationResult(905);
+
+            ConfirmationKey key = new ConfirmationKey()
+            {
+                UserId = user.Id,
+                HashCode = SecureCryptoGenerator.GenerateRecoveryUri(),
+                Key = "1234",
+                KeyType = "recovery.Email",
+                CreatedDateUTC = DateTime.UtcNow,
+                ExpireDateUTC = DateTime.UtcNow.AddHours(1)
+            };
+            _repo.ConfirmationKey.Create(key);
+            await _repo.ConfirmationKey.SaveAsync();
+
+
+            /*Send Email with link*/
+            string link = $"http://localhost:5000/ResetPasword?uri={Uri.EscapeDataString(key.HashCode)}";
+
+            return new RegistrationResult(999);
+        }
+
         public async Task<ActionResult<RegistrationResult>> RecoveryPhoneConfirm([FromQuery]RecoveryViewModel model)
         {
             if (
@@ -210,7 +241,7 @@ namespace VdarApi.Controllers
             if (confirmation == null)
                 return new RegistrationResult(906);
 
-            var user = await _repo.User.GetUserByIdAsync(confirmation.Id);
+            var user = await _repo.User.GetUserByIdAsync(confirmation.UserId);
 
             string salt = SecurePasswordHasherHelper.GenerateSalt();
             user.Salt = salt;

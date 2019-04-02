@@ -7,6 +7,7 @@ namespace Contracts.Repository
     {
         Task<User> GetUserByIdAsync(int id);
         Task<User> GetUserByPhoneAsync(string phone);
+        Task<User> GetUserByEmailAsync(string email);
         Task<User> LoginUserAsync(string login, string password);
     }
 }

@@ -18,6 +18,10 @@ namespace Repository
             await RepositoryContext.Users.SingleOrDefaultAsync(u => 
                 u.PhoneNumber.Equals(phone));
 
+        async public Task<User> GetUserByEmailAsync(string email) =>
+            await RepositoryContext.Users.SingleOrDefaultAsync(u =>
+                u.Email.Equals(email));
+
         async public Task<User> LoginUserAsync(string login, string password) =>
             await RepositoryContext.Users.SingleOrDefaultAsync(u =>
                              (
@@ -31,5 +35,6 @@ namespace Repository
             await RepositoryContext.Users.SingleOrDefaultAsync(u =>
                 u.Id.Equals(id));
 
+        
     }
 }
