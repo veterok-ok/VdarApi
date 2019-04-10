@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Repository
 {
-    public class TokenRepository : RepositoryBase<Tokens>, ITokenRepository
+    public class TokenRepository : RepositoryBase<Token>, ITokenRepository
     {
         public TokenRepository(VdarDbContext repositoryContext)
           : base(repositoryContext)
@@ -16,11 +16,11 @@ namespace Repository
 
         }
 
-        async public Task<List<Tokens>> GetFailedTokensAsync(int userId, string fingerPrint) =>
+        async public Task<List<Token>> GetFailedTokensAsync(int userId, string fingerPrint) =>
             await RepositoryContext.Tokens.Where(
-                           z => z.FingerPrint.Equals(fingerPrint) && z.ClientId.Equals(userId)).ToListAsync();
+                           z => z.FingerPrint.Equals(fingerPrint) && z.UserId.Equals(userId)).ToListAsync();
 
-        async public Task<Tokens> GetTokenAsync(string fingerPrint, string accessToken, string refreshToken) =>
+        async public Task<Token> GetTokenAsync(string fingerPrint, string accessToken, string refreshToken) =>
             await RepositoryContext.Tokens.FirstOrDefaultAsync(
                         x =>    x.FingerPrint.Equals(fingerPrint) &&
                                 x.RefreshToken.Equals(refreshToken) &&

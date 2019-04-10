@@ -15,7 +15,7 @@ namespace VdarApi.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.8-servicing-32085")
+                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -32,19 +32,23 @@ namespace VdarApi.Migrations
                     b.Property<string>("HashCode");
 
                     b.Property<string>("Key")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(10);
 
                     b.Property<string>("KeyType")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(25);
 
                     b.Property<int>("UserId");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("ConfirmationKeys");
                 });
 
-            modelBuilder.Entity("Entities.Models.Tokens", b =>
+            modelBuilder.Entity("Entities.Models.Token", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -53,14 +57,13 @@ namespace VdarApi.Migrations
                     b.Property<string>("AccessToken")
                         .IsRequired();
 
-                    b.Property<int>("ClientId");
-
                     b.Property<DateTime>("CreatedDateUTC");
 
                     b.Property<string>("FingerPrint")
                         .IsRequired();
 
-                    b.Property<string>("IP");
+                    b.Property<string>("IP")
+                        .HasMaxLength(100);
 
                     b.Property<DateTime>("LastRefreshDateUTC");
 
@@ -74,7 +77,11 @@ namespace VdarApi.Migrations
 
                     b.Property<string>("UserAgent");
 
+                    b.Property<int>("UserId");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Tokens");
                 });
@@ -91,38 +98,66 @@ namespace VdarApi.Migrations
 
                     b.Property<DateTime>("CreatedDateUtc");
 
-                    b.Property<string>("Email");
+                    b.Property<string>("Email")
+                        .HasMaxLength(320);
 
                     b.Property<bool>("EmailIsConfirmed");
 
-                    b.Property<string>("FathersName");
+                    b.Property<bool>("EmailIsSubscribe");
+
+                    b.Property<string>("EmailKeyUnSubscribe");
+
+                    b.Property<string>("FathersName")
+                        .HasMaxLength(250);
 
                     b.Property<bool>("IsActive");
 
-                    b.Property<string>("Login");
+                    b.Property<string>("Login")
+                        .HasMaxLength(50);
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasMaxLength(250);
 
                     b.Property<string>("Password")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(100);
 
                     b.Property<bool>("PhoneIsConfirmed");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(20);
 
-                    b.Property<string>("Salt");
+                    b.Property<string>("Salt")
+                        .HasMaxLength(50);
 
-                    b.Property<string>("SurName");
+                    b.Property<string>("SurName")
+                        .HasMaxLength(250);
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
 
                     b.HasData(
-                        new { Id = 1, ActivatedDateUtc = new DateTime(2019, 3, 9, 8, 3, 5, 861, DateTimeKind.Utc), Birthday = new DateTime(1992, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), CreatedDateUtc = new DateTime(2019, 3, 23, 8, 47, 17, 862, DateTimeKind.Utc), Email = "admin@google.com", EmailIsConfirmed = false, FathersName = "Andreevich", IsActive = true, Login = "vektor", Name = "Viktor", Password = "NNItlsZ4AqDhTbvfp34fZ3uBbha4KfPxwHjl1gJob4A=", PhoneIsConfirmed = true, PhoneNumber = "7771291221", Salt = "lrg2WHC1g9+fOjqIFKFHRw==", SurName = "Bochikalov" },
-                        new { Id = 2, CreatedDateUtc = new DateTime(2019, 3, 23, 8, 47, 17, 864, DateTimeKind.Utc), EmailIsConfirmed = false, IsActive = true, Name = "Levon", Password = "dNYtoT6mDNWqiJMr4MhH0WFfxCGb/uNXC1e6eFECp2k=", PhoneIsConfirmed = false, PhoneNumber = "7771940504", Salt = "0EDX042sj+8KZwWJuFGxJg==", SurName = "Kukuyan" }
+                        new { Id = 1, ActivatedDateUtc = new DateTime(2019, 3, 27, 9, 14, 36, 853, DateTimeKind.Utc), Birthday = new DateTime(1992, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), CreatedDateUtc = new DateTime(2019, 4, 10, 9, 58, 48, 886, DateTimeKind.Utc), Email = "admin@google.com", EmailIsConfirmed = false, EmailIsSubscribe = false, FathersName = "Andreevich", IsActive = true, Login = "vektor", Name = "Viktor", Password = "cvgWVx2PzyodoHjQuvNZza7SQzZ/dN3lACijh7STvr0=", PhoneIsConfirmed = true, PhoneNumber = "7771291221", Salt = "RrL2RyNzrMzB6CA7ZRe+9g==", SurName = "Bochikalov" },
+                        new { Id = 2, CreatedDateUtc = new DateTime(2019, 4, 10, 9, 58, 48, 888, DateTimeKind.Utc), EmailIsConfirmed = false, EmailIsSubscribe = false, IsActive = true, Name = "Levon", Password = "prMiHmsITfkH/siMY/aRmpP5epzS0tuKir39cp+dbtw=", PhoneIsConfirmed = false, PhoneNumber = "7771940504", Salt = "fqVPoSLeMzonCyoK0NbBUg==", SurName = "Kukuyan" }
                     );
+                });
+
+            modelBuilder.Entity("Entities.Models.ConfirmationKey", b =>
+                {
+                    b.HasOne("Entities.Models.User", "User")
+                        .WithMany("ConfirmationKeys")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Entities.Models.Token", b =>
+                {
+                    b.HasOne("Entities.Models.User", "User")
+                        .WithMany("Tokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

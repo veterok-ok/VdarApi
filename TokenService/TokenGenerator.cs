@@ -21,7 +21,7 @@ namespace TokenService
             _repo = wrapperRepository;
         }
 
-        async public Task<Tokens> GenerateJWTTokenAsync(User user, ClientParameters parameters)
+        async public Task<Token> GenerateJWTTokenAsync(User user, ClientParameters parameters)
         {
             // Удаляем токен пользователя (в разрезе браузера), на случай если он украден
             var notActualTokens = await _repo.Token.GetFailedTokensAsync(user.Id, parameters.finger_print ?? "");
@@ -32,9 +32,9 @@ namespace TokenService
             }
             //Формируем новый токен
             var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
-            var token = new Tokens
+            var token = new Token
             {
-                ClientId = user.Id,
+                UserId = user.Id,
                 AccessToken = GetJWT(user, user.GetHashCode().ToString()),
                 RefreshToken = refresh_token,
                 UpdateHashSum = user.GetHashCode().ToString(),

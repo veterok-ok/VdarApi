@@ -8,7 +8,7 @@ namespace Contracts
 {
     public interface ITokenGenerator
     {
-        Task<Tokens> GenerateJWTTokenAsync(User user, ClientParameters parameter);
+        Task<Token> GenerateJWTTokenAsync(User user, ClientParameters parameter);
         string GetJWT(User user, string userHash, IEnumerable<Claim> claims);
     }
 }
