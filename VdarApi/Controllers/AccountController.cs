@@ -17,14 +17,17 @@ namespace VdarApi.Controllers
         private IRepositoryWrapper _repo;
         private ITokenGenerator tokenGenerator;
         private ILoggerManager _logger;
+        private Contracts.ISenderManager _sender;
 
         public AccountController(IRepositoryWrapper wrapperRepository, 
                                  ITokenGenerator tokenGenerator,
-                                 ILoggerManager logger)
+                                 ILoggerManager logger,
+                                 Contracts.ISenderManager sender)
         {
             this._repo = wrapperRepository;
             this.tokenGenerator = tokenGenerator;
             this._logger = logger;
+            this._sender = sender;
         }
 
         [HttpPost]
@@ -91,6 +94,8 @@ namespace VdarApi.Controllers
 
             _repo.ConfirmationKey.Create(key);
             await _repo.ConfirmationKey.SaveAsync();
+
+            await _sender.SendSMSAsync("", "", "");
 
             _logger.LogDebug($"[Registration.End] phone: {model.Phone}; password: {model.Password};");
             return new RegistrationResult(999);

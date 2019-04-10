@@ -30,6 +30,7 @@ namespace VdarApi
             services.ConfigureTokenService();
             services.ConfigureCors();
             services.ConfigureAuthentication();
+            services.ConfigureSenderService();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -51,7 +52,7 @@ namespace VdarApi
 
             app.UseAuthentication();
 
-            app.ConfigureExceptionHandler(logger);
+            //app.ConfigureExceptionHandler(logger);
 
             //app.UseStaticFiles();
 

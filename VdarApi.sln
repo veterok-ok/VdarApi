@@ -5,17 +5,19 @@ VisualStudioVersion = 15.0.28010.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VdarApi", "VdarApi\VdarApi.csproj", "{3F5B7C77-EACF-4B43-9503-4AD3F00B26AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{183BA5CF-A796-4B1D-9CFA-C963B31947C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "Contracts\Contracts.csproj", "{183BA5CF-A796-4B1D-9CFA-C963B31947C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggerService", "LoggerService\LoggerService.csproj", "{9F512219-CDE5-4AFD-9130-341733CE3E64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoggerService", "LoggerService\LoggerService.csproj", "{9F512219-CDE5-4AFD-9130-341733CE3E64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Repository.csproj", "{AA8B7508-53F2-404F-BB62-7EB3FEE91117}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "Repository\Repository.csproj", "{AA8B7508-53F2-404F-BB62-7EB3FEE91117}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "Entities\Entities.csproj", "{0BB55D58-DF62-4FE8-9C93-DEC9D365D3D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entities", "Entities\Entities.csproj", "{0BB55D58-DF62-4FE8-9C93-DEC9D365D3D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TokenService", "TokenService\TokenService.csproj", "{FD75A604-45F2-4F0C-8735-5AD1BE166639}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TokenService", "TokenService\TokenService.csproj", "{FD75A604-45F2-4F0C-8735-5AD1BE166639}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpers", "Helpers\Helpers.csproj", "{7E6AADA5-465E-4769-8771-ACEE254E00C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helpers", "Helpers\Helpers.csproj", "{7E6AADA5-465E-4769-8771-ACEE254E00C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SenderService", "SenderService\SenderService.csproj", "{C36C685E-9B8B-4FEA-988D-F847596D1232}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{7E6AADA5-465E-4769-8771-ACEE254E00C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E6AADA5-465E-4769-8771-ACEE254E00C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E6AADA5-465E-4769-8771-ACEE254E00C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C36C685E-9B8B-4FEA-988D-F847596D1232}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C36C685E-9B8B-4FEA-988D-F847596D1232}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C36C685E-9B8B-4FEA-988D-F847596D1232}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C36C685E-9B8B-4FEA-988D-F847596D1232}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SenderService;
 
 namespace VdarApi.Extensions
 {
@@ -31,6 +32,11 @@ namespace VdarApi.Extensions
         public static void ConfigureLoggerService(this IServiceCollection services)
         {
             services.AddSingleton<ILoggerManager, LoggerManager>();
+        }
+
+        public static void ConfigureSenderService(this IServiceCollection services)
+        {
+            services.AddSingleton<Contracts.ISenderManager, SenderManager>();
         }
 
         public static void ConfigureCors(this IServiceCollection services)
