@@ -1,6 +1,4 @@
-﻿using System;
-using Helpers.Security;
-using Entities.Models;
+﻿using Entities.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Entities
@@ -13,48 +11,21 @@ namespace Entities
 
         }
 
-        public DbSet<Token> Tokens { get; set; }
+        public DbSet<Country> Countries { get; set; }
+        public DbSet<City> Cities { get; set; }
+        
         public DbSet<User> Users { get; set; }
         public DbSet<ConfirmationKey> ConfirmationKeys { get; set; }
+        public DbSet<Token> Tokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            string _salt = SecurePasswordHasherHelper.GenerateSalt();
-            string _salt2 = SecurePasswordHasherHelper.GenerateSalt();
-            User[] users = new User[]{
-                new User {
-                    Id = 1,
-                    Password = SecurePasswordHasherHelper.Hash("123", _salt),
-                    Salt = _salt,
-                    Name = "Viktor",
-                    SurName = "Bochikalov",
-                    FathersName = "Andreevich",
-                    PhoneNumber = "7771291221",
-                    EmailIsConfirmed = false,
-                    PhoneIsConfirmed = true,
-                    IsActive = true,
-                    Login = "vektor",
-                    ActivatedDateUtc = DateTime.UtcNow.AddSeconds(-1212252),
-                    Birthday = DateTime.Parse("23.05.1992"),
-                    Email = "admin@google.com",
-                    CreatedDateUtc = DateTime.UtcNow
-                },
-                new User {
-                    Id = 2,
-                    Password = SecurePasswordHasherHelper.Hash("123", _salt2),
-                    Salt = _salt2,
-                    Name = "Levon",
-                    SurName = "Kukuyan",
-                    PhoneNumber = "7771940504",
-                    PhoneIsConfirmed = false,
-                    IsActive = true,
-                    CreatedDateUtc = DateTime.UtcNow
-                }
-            };
+            modelBuilder.Entity<Country>().HasData(_ModelCreationCollection.GetCountries());
+            modelBuilder.Entity<City>().HasData(_ModelCreationCollection.GetCities());
 
-            modelBuilder.Entity<User>().HasData(users);
+            modelBuilder.Entity<User>().HasData(_ModelCreationCollection.GetUsers());
 
             base.OnModelCreating(modelBuilder);
-    }
+        }
     }
 }

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Entities.Models
 {
+    [Table("ConfirmationKeys", Schema = "Identity")]
     public class ConfirmationKey
     {
         [Key]
