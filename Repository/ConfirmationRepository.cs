@@ -36,6 +36,12 @@ namespace Repository
                    c.HashCode.Equals(uri)
                 );
 
+        async public Task<ConfirmationKey> GetByHashCode(string hashcode, string type) =>
+            await RepositoryContext.ConfirmationKeys.SingleOrDefaultAsync(c =>
+                   c.HashCode.Equals(hashcode) &&
+                   c.KeyType.Equals(type)
+                );
+
         async public Task<int> GetCountAttemptConfirmationAsync(int userId, string confirmationType) =>
             await RepositoryContext.ConfirmationKeys.AsNoTracking().CountAsync(c =>
                  c.KeyType.Equals(confirmationType, StringComparison.CurrentCultureIgnoreCase) &&

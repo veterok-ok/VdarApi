@@ -145,6 +145,7 @@ namespace VdarApi.Controllers
             });
         }
 
+        [HttpPost]
         public async Task<ActionResult<RegistrationResult>> RecoveryPhone([FromQuery]RecoveryViewModel model)
         {
             if (
@@ -171,6 +172,7 @@ namespace VdarApi.Controllers
             return new RegistrationResult(999);
         }
 
+        [HttpPost]
         public async Task<ActionResult<RegistrationResult>> RecoveryEmail([FromQuery]RecoveryViewModel model)
         {
             if (
@@ -202,6 +204,7 @@ namespace VdarApi.Controllers
             return new RegistrationResult(999);
         }
 
+        [HttpPost]
         public async Task<ActionResult<RegistrationResult>> RecoveryPhoneConfirm([FromQuery]RecoveryViewModel model)
         {
             if (
@@ -233,6 +236,7 @@ namespace VdarApi.Controllers
             return new RegistrationResult(999, new { hash = Uri.EscapeDataString(confirmation.HashCode) });
         }
 
+        [HttpPost]
         public async Task<ActionResult<RegistrationResult>> RecoveryChangePassword([FromQuery]RecoveryChangePassword model)
         {
             if (String.IsNullOrEmpty(model.Uri) ||
@@ -257,5 +261,49 @@ namespace VdarApi.Controllers
             return new RegistrationResult(999);
         }
 
-    }
+        /* UnSubsribe метод - Отписка от рассылки на Email почту пользователя */
+        [HttpPost]
+        public async Task<ActionResult<RegistrationResult>> UnSubscribe([FromQuery] UnSubscribe model)
+        {
+            if ( String.IsNullOrEmpty(model.Key) )
+                return new RegistrationResult(901);
+
+            var user = await _repo.User.GetUserByIdAsync(model.Id);
+
+            if (user == null)
+                return new RegistrationResult(901);
+
+            if (user.EmailIsSubscribe)
+            {
+                if (user.EmailKeyUnSubscribe.Equals(model.Key)) { 
+                    user.EmailIsSubscribe = false;
+                    _repo.User.Update(user);
+                    await _repo.User.SaveAsync();
+                }
+                else
+                    return new RegistrationResult(901);
+            }
+
+            return new RegistrationResult(999);
+        }
+
+        /*ConfirmSubscribe метод - Подтверждение о намерении получать рассылку 
+         *                         выполняется с помощью ссылки в письме */
+        public async Task<ActionResult<RegistrationResult>> ConfirmSubscribe([FromQuery] ConfirmSubscribe model)
+        {
+            if (String.IsNullOrEmpty(model.Key))
+                return new RegistrationResult(901);
+
+            var confirmation = await _repo.ConfirmationKey.GetByHashCode(model.Key, "email.Subscribe");
+
+            if (confirmation == null)
+                return new RegistrationResult(901);
+
+            confirmation.User.EmailIsSubscribe = true;
+            _repo.User.Update(confirmation.User);
+            await _repo.User.SaveAsync();
+
+            return new RegistrationResult(999);
+        }
+     }
 }

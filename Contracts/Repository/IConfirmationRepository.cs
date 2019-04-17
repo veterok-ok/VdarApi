@@ -7,6 +7,7 @@ namespace Contracts.Repository
     {
         Task<ConfirmationKey> EnterConfirmationAsync(ConfirmationKey key);
         Task<ConfirmationKey> GetByUri(string uri);
+        Task<ConfirmationKey> GetByHashCode(string hashcode, string type);
         Task<bool> CheckConfirmationKeyAsync(ConfirmationKey key);
         Task<int> GetCountAttemptConfirmationAsync(int userId, string confirmationType);
         void RemoveNotActualKeys(ConfirmationKey key);
