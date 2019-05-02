@@ -31,19 +31,19 @@ namespace VdarApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<RegistrationResult>> Registration([FromQuery]RegistrationViewModel model)
+        public async Task<ActionResult<AccountResult>> Registration([FromQuery]RegistrationViewModel model)
         {
             _logger.LogDebug($"[Registration.Start] phone: {model.Phone}; password: {model.Password};");
             if (
                String.IsNullOrEmpty(model.Password) ||
                String.IsNullOrEmpty(model.Phone)
                )
-                return new RegistrationResult(901);
+                return new AccountResult(901);
 
             var user = await _repo.User.GetUserByPhoneAsync(model.Phone);
 
             if (user != null && user.PhoneIsConfirmed) {
-                var _result = new RegistrationResult(902);
+                var _result = new AccountResult(902);
                 _logger.LogInfo($"[Registration.Error] {_result.Message}, phone: {model.Phone};");
                 return _result;
             }
@@ -78,7 +78,7 @@ namespace VdarApi.Controllers
 
 
             if (await _repo.ConfirmationKey.GetCountAttemptConfirmationAsync(user.Id, "SMS") > 2) {
-                var _result = new RegistrationResult(903);
+                var _result = new AccountResult(903);
                 _logger.LogInfo($"[Registration.Error] {_result.Message}, phone: {model.Phone};");
                 return _result;
             }
@@ -98,23 +98,23 @@ namespace VdarApi.Controllers
             await _sender.SendSMSAsync("", "", "");
 
             _logger.LogDebug($"[Registration.End] phone: {model.Phone}; password: {model.Password};");
-            return new RegistrationResult(999);
+            return new AccountResult(999);
         }
 
         [HttpPost]
-        public async Task<ActionResult<RegistrationResult>> RegistrationConfirm([FromQuery]RegistrationViewModel model)
+        public async Task<ActionResult<AccountResult>> RegistrationConfirm([FromQuery]RegistrationViewModel model)
         {
             if (
                 String.IsNullOrEmpty(model.Password) ||
                 String.IsNullOrEmpty(model.Phone) ||
                 String.IsNullOrEmpty(model.SecurityCode)
                 )
-                return new RegistrationResult(901);
+                return new AccountResult(901);
 
             var user = await _repo.User.GetUserByPhoneAsync(model.Phone);
 
             if (user == null)
-                return new RegistrationResult(905);
+                return new AccountResult(905);
 
             ConfirmationKey key = new ConfirmationKey()
             {
@@ -124,7 +124,7 @@ namespace VdarApi.Controllers
             };
 
             if (!await _repo.ConfirmationKey.CheckConfirmationKeyAsync(key))
-                return new RegistrationResult(904);
+                return new AccountResult(904);
 
             user.ActivatedDateUtc = DateTime.UtcNow;
             user.PhoneIsConfirmed = true;
@@ -138,7 +138,7 @@ namespace VdarApi.Controllers
 
             var token = await tokenGenerator.GenerateJWTTokenAsync(user, (ClientParameters)model);
 
-            return new RegistrationResult(999, new
+            return new AccountResult(999, new
             {
                 access_token = token.AccessToken,
                 refresh_token = token.RefreshToken
@@ -146,17 +146,17 @@ namespace VdarApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<RegistrationResult>> RecoveryPhone([FromQuery]RecoveryViewModel model)
+        public async Task<ActionResult<AccountResult>> RecoveryPhone([FromQuery]RecoveryViewModel model)
         {
             if (
                String.IsNullOrEmpty(model.Login)
                )
-                return new RegistrationResult(901);
+                return new AccountResult(901);
 
             var user = await _repo.User.GetUserByPhoneAsync(model.Login);
 
             if (user == null)
-                return new RegistrationResult(905);
+                return new AccountResult(905);
 
             ConfirmationKey key = new ConfirmationKey()
             {
@@ -169,21 +169,21 @@ namespace VdarApi.Controllers
             _repo.ConfirmationKey.Create(key);
             await _repo.ConfirmationKey.SaveAsync();
 
-            return new RegistrationResult(999);
+            return new AccountResult(999);
         }
 
         [HttpPost]
-        public async Task<ActionResult<RegistrationResult>> RecoveryEmail([FromQuery]RecoveryViewModel model)
+        public async Task<ActionResult<AccountResult>> RecoveryEmail([FromQuery]RecoveryViewModel model)
         {
             if (
                String.IsNullOrEmpty(model.Login)
                )
-                return new RegistrationResult(901);
+                return new AccountResult(901);
 
             var user = await _repo.User.GetUserByEmailAsync(model.Login);
 
             if (user == null)
-                return new RegistrationResult(905);
+                return new AccountResult(905);
 
             ConfirmationKey key = new ConfirmationKey()
             {
@@ -201,22 +201,22 @@ namespace VdarApi.Controllers
             /*Send Email with link*/
             string link = $"http://localhost:5000/ResetPasword?uri={Uri.EscapeDataString(key.HashCode)}";
 
-            return new RegistrationResult(999);
+            return new AccountResult(999);
         }
 
         [HttpPost]
-        public async Task<ActionResult<RegistrationResult>> RecoveryPhoneConfirm([FromQuery]RecoveryViewModel model)
+        public async Task<ActionResult<AccountResult>> RecoveryPhoneConfirm([FromQuery]RecoveryViewModel model)
         {
             if (
               String.IsNullOrEmpty(model.Login) || 
               String.IsNullOrEmpty(model.SecurityKey)
               )
-                return new RegistrationResult(901);
+                return new AccountResult(901);
 
             var user = await _repo.User.GetUserByPhoneAsync(model.Login);
 
             if (user == null)
-                return new RegistrationResult(905);
+                return new AccountResult(905);
 
             var confirmation = await _repo.ConfirmationKey.EnterConfirmationAsync(new ConfirmationKey()
             {
@@ -226,29 +226,29 @@ namespace VdarApi.Controllers
             });
 
             if (confirmation == null)
-                return new RegistrationResult(906);
+                return new AccountResult(906);
 
             confirmation.HashCode = SecureCryptoGenerator.GenerateRecoveryUri();
             _repo.ConfirmationKey.Update(confirmation);
             await _repo.ConfirmationKey.SaveAsync();
 
 
-            return new RegistrationResult(999, new { hash = Uri.EscapeDataString(confirmation.HashCode) });
+            return new AccountResult(999, new { hash = Uri.EscapeDataString(confirmation.HashCode) });
         }
 
         [HttpPost]
-        public async Task<ActionResult<RegistrationResult>> RecoveryChangePassword([FromQuery]RecoveryChangePassword model)
+        public async Task<ActionResult<AccountResult>> RecoveryChangePassword([FromQuery]RecoveryChangePassword model)
         {
             if (String.IsNullOrEmpty(model.Uri) ||
                 String.IsNullOrEmpty(model.Password) ||
                 String.IsNullOrEmpty(model.ConfirmPassword)
                 )
-                return new RegistrationResult(901);
+                return new AccountResult(901);
 
             var confirmation = await _repo.ConfirmationKey.GetByUri(model.Uri);
 
             if (confirmation == null)
-                return new RegistrationResult(906);
+                return new AccountResult(906);
 
             var user = await _repo.User.GetUserByIdAsync(confirmation.UserId);
 
@@ -258,20 +258,20 @@ namespace VdarApi.Controllers
             _repo.User.Update(user);
             await _repo.User.SaveAsync();
 
-            return new RegistrationResult(999);
+            return new AccountResult(999);
         }
 
         /* UnSubsribe метод - Отписка от рассылки на Email почту пользователя */
         [HttpPost]
-        public async Task<ActionResult<RegistrationResult>> UnSubscribe([FromQuery] UnSubscribe model)
+        public async Task<ActionResult<AccountResult>> UnSubscribe([FromQuery] UnSubscribe model)
         {
             if ( String.IsNullOrEmpty(model.Key) )
-                return new RegistrationResult(901);
+                return new AccountResult(901);
 
             var user = await _repo.User.GetUserByIdAsync(model.Id);
 
             if (user == null)
-                return new RegistrationResult(901);
+                return new AccountResult(901);
 
             if (user.EmailIsSubscribe)
             {
@@ -281,29 +281,30 @@ namespace VdarApi.Controllers
                     await _repo.User.SaveAsync();
                 }
                 else
-                    return new RegistrationResult(901);
+                    return new AccountResult(901);
             }
 
-            return new RegistrationResult(999);
+            return new AccountResult(999);
         }
 
         /*ConfirmSubscribe метод - Подтверждение о намерении получать рассылку 
          *                         выполняется с помощью ссылки в письме */
-        public async Task<ActionResult<RegistrationResult>> ConfirmSubscribe([FromQuery] ConfirmSubscribe model)
+        public async Task<ActionResult<AccountResult>> ConfirmSubscribe([FromQuery] ConfirmSubscribe model)
         {
             if (String.IsNullOrEmpty(model.Key))
-                return new RegistrationResult(901);
+                return new AccountResult(901);
 
             var confirmation = await _repo.ConfirmationKey.GetByHashCode(model.Key, "email.Subscribe");
 
             if (confirmation == null)
-                return new RegistrationResult(901);
+                return new AccountResult(901);
 
             confirmation.User.EmailIsSubscribe = true;
             _repo.User.Update(confirmation.User);
             await _repo.User.SaveAsync();
 
-            return new RegistrationResult(999);
+            return new AccountResult(999);
         }
+
      }
 }
