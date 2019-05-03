@@ -7,6 +7,8 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Helpers.Security;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace VdarApi.Controllers
 {
@@ -158,6 +160,14 @@ namespace VdarApi.Controllers
             if (user == null)
                 return new AccountResult(905);
 
+
+            if (await _repo.ConfirmationKey.GetCountAttemptConfirmationAsync(user.Id, "SMS") > 2)
+            {
+                var _result = new AccountResult(903);
+                _logger.LogInfo($"[RecoveryPhone.Error] {_result.Message}, phone: {user.PhoneNumber};");
+                return _result;
+            }
+
             ConfirmationKey key = new ConfirmationKey()
             {
                 UserId = user.Id,
@@ -168,6 +178,8 @@ namespace VdarApi.Controllers
             };
             _repo.ConfirmationKey.Create(key);
             await _repo.ConfirmationKey.SaveAsync();
+
+            //Отправить SMS
 
             return new AccountResult(999);
         }
@@ -188,7 +200,7 @@ namespace VdarApi.Controllers
             ConfirmationKey key = new ConfirmationKey()
             {
                 UserId = user.Id,
-                HashCode = SecureCryptoGenerator.GenerateRecoveryUri(),
+                HashCode = SecureCryptoGenerator.GenerateUri(),
                 Key = "1234",
                 KeyType = "recovery.Email",
                 CreatedDateUTC = DateTime.UtcNow,
@@ -227,8 +239,8 @@ namespace VdarApi.Controllers
 
             if (confirmation == null)
                 return new AccountResult(906);
-
-            confirmation.HashCode = SecureCryptoGenerator.GenerateRecoveryUri();
+            //Формируем HashCode для страницы "Смена пароля"
+            confirmation.HashCode = SecureCryptoGenerator.GenerateUri();
             _repo.ConfirmationKey.Update(confirmation);
             await _repo.ConfirmationKey.SaveAsync();
 
@@ -261,9 +273,74 @@ namespace VdarApi.Controllers
             return new AccountResult(999);
         }
 
-        /* UnSubsribe метод - Отписка от рассылки на Email почту пользователя */
         [HttpPost]
-        public async Task<ActionResult<AccountResult>> UnSubscribe([FromQuery] UnSubscribe model)
+        [Authorize]
+        public async Task<ActionResult<AccountResult>> Subscribe()
+        {
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            User _user = await _repo.User.GetUserByIdAsync(userId);
+
+            if (_user == null)
+                return new AccountResult(905);
+
+            string _email = _user.Email;
+
+            if (String.IsNullOrEmpty(_email))
+                return new AccountResult(908);
+
+            if (_user.EmailIsConfirmed)
+            {
+                _user.EmailIsSubscribe = true;
+                _repo.User.Update(_user);
+                await _repo.User.SaveAsync();
+            }
+            else
+            {
+                ConfirmationKey key = new ConfirmationKey()
+                {
+                    UserId = _user.Id,
+                    HashCode = SecureCryptoGenerator.GenerateUri(),
+                    Key = "",
+                    KeyType = "confirm.Email",
+                    CreatedDateUTC = DateTime.UtcNow,
+                    ExpireDateUTC = DateTime.UtcNow.AddDays(2)
+                };
+                _repo.ConfirmationKey.Create(key);
+                await _repo.ConfirmationKey.SaveAsync();
+
+                string link = $"http://localhost:5000/EmailConfirm?uri={Uri.EscapeDataString(key.HashCode)}";
+
+                //Отправить ссылку на почту
+                return new AccountResult(998);
+            }
+
+            return new AccountResult(999);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<ActionResult<AccountResult>> UnSubscribeByClick()
+        {
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            User _user = await _repo.User.GetUserByIdAsync(userId);
+
+            if (_user == null)
+                return new AccountResult(905);
+
+            if (_user.EmailIsSubscribe)
+            {
+                _user.EmailIsSubscribe = false;
+                _repo.User.Update(_user);
+                await _repo.User.SaveAsync();
+            }
+
+            return new AccountResult(999);
+        }
+        
+        [HttpPost]
+        public async Task<ActionResult<AccountResult>> UnSubscribeByEmail([FromQuery] UnSubscribe model)
         {
             if ( String.IsNullOrEmpty(model.Key) )
                 return new AccountResult(901);
@@ -271,7 +348,7 @@ namespace VdarApi.Controllers
             var user = await _repo.User.GetUserByIdAsync(model.Id);
 
             if (user == null)
-                return new AccountResult(901);
+                return new AccountResult(905);
 
             if (user.EmailIsSubscribe)
             {
@@ -281,30 +358,33 @@ namespace VdarApi.Controllers
                     await _repo.User.SaveAsync();
                 }
                 else
-                    return new AccountResult(901);
+                    return new AccountResult(908);
             }
 
             return new AccountResult(999);
         }
-
-        /*ConfirmSubscribe метод - Подтверждение о намерении получать рассылку 
-         *                         выполняется с помощью ссылки в письме */
-        public async Task<ActionResult<AccountResult>> ConfirmSubscribe([FromQuery] ConfirmSubscribe model)
+              
+        [HttpPost]
+        public async Task<ActionResult<AccountResult>> ConfirmEmail([FromQuery] ConfirmEmail model)
         {
             if (String.IsNullOrEmpty(model.Key))
                 return new AccountResult(901);
 
-            var confirmation = await _repo.ConfirmationKey.GetByHashCode(model.Key, "email.Subscribe");
+            var confirmation = await _repo.ConfirmationKey.GetByHashCode(model.Key, "confirm.Email");
 
             if (confirmation == null)
-                return new AccountResult(901);
+                return new AccountResult(907);
 
             confirmation.User.EmailIsSubscribe = true;
             _repo.User.Update(confirmation.User);
             await _repo.User.SaveAsync();
 
+            _repo.ConfirmationKey.RemoveNotActualKeys(confirmation);
+            await _repo.ConfirmationKey.SaveAsync();
+
             return new AccountResult(999);
         }
 
-     }
+
+    }
 }

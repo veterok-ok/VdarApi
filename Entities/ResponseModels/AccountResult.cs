@@ -15,8 +15,11 @@ namespace Entities.ResponseModels
             {904, "Incorrect Security Code" },//Введен неверный код подтверждения
             {905, "User is missing" },//Данного пользователя нет в базе данных
             {906, "Confirmation code incorect" },//Введенные данные по подтверждению кода не найдены в БД 
-            {907, "Could not find the specified subscription confirmation key" },//Не удалось продтвердить подписку на рассылку, не найден токен в таблице ConfirmationKeys
-            {999, "OK" }//Всё ок
+            {907, "Could not find the specified subscription confirmation key" },//Не удалось продтвердить подписку на рассылку, не найден токен в таблице ConfirmationKeys,
+            {908, "Email is missing" },//У пользователя не прописан email в личных данных
+            {909, "Unsubscribe key incorect" },//Указанный код отписки не соответсвует коду отписки пользователя
+            { 998, "Please, confirm email" },//Всё ок, необходимо подтвердить email на почте
+            { 999, "OK" }//Всё ок
         };
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Entities.RequestModels
 {
-    public class ConfirmSubscribe
+    public class ConfirmEmail
     {
         public int ConfirmId { get; set; }
         public string Key { get; set; }        
