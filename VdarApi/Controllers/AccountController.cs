@@ -376,6 +376,7 @@ namespace VdarApi.Controllers
                 return new AccountResult(907);
 
             confirmation.User.EmailIsSubscribe = true;
+            confirmation.User.EmailIsConfirmed = true;
             _repo.User.Update(confirmation.User);
             await _repo.User.SaveAsync();
 
