@@ -13,7 +13,7 @@ using System.Security.Claims;
 namespace VdarApi.Controllers
 {
     [Route("api/[controller]/[action]")]
-    [ApiController]    
+    [ApiController]
     public class AccountController : ControllerBase
     {
         private IRepositoryWrapper _repo;
@@ -21,7 +21,7 @@ namespace VdarApi.Controllers
         private ILoggerManager _logger;
         private Contracts.ISenderManager _sender;
 
-        public AccountController(IRepositoryWrapper wrapperRepository, 
+        public AccountController(IRepositoryWrapper wrapperRepository,
                                  ITokenGenerator tokenGenerator,
                                  ILoggerManager logger,
                                  Contracts.ISenderManager sender)
@@ -220,7 +220,7 @@ namespace VdarApi.Controllers
         public async Task<ActionResult<AccountResult>> RecoveryPhoneConfirm([FromQuery]RecoveryViewModel model)
         {
             if (
-              String.IsNullOrEmpty(model.Login) || 
+              String.IsNullOrEmpty(model.Login) ||
               String.IsNullOrEmpty(model.SecurityKey)
               )
                 return new AccountResult(901);
@@ -268,6 +268,32 @@ namespace VdarApi.Controllers
             user.Salt = salt;
             user.Password = SecurePasswordHasherHelper.Hash(model.Password, salt);
             _repo.User.Update(user);
+            await _repo.User.SaveAsync();
+
+            return new AccountResult(999);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<ActionResult<AccountResult>> ChangePassword([FromQuery] ChangePassword model)
+        {
+            if (String.IsNullOrEmpty(model.Password) ||
+                String.IsNullOrEmpty(model.NewPassword) ||
+                String.IsNullOrEmpty(model.NewPasswordConfirm))
+                return new AccountResult(901);
+
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            User _user = await _repo.User.GetUserByIdAsync(userId);
+            if (_user == null)
+                return new AccountResult(905);
+
+            if (!SecurePasswordHasherHelper.Validate(model.Password, _user.Salt, _user.Password))
+                return new AccountResult(910);
+            
+            string salt = SecurePasswordHasherHelper.GenerateSalt();
+            _user.Salt = salt;
+            _user.Password = SecurePasswordHasherHelper.Hash(model.NewPassword, salt);
+            _repo.User.Update(_user);
             await _repo.User.SaveAsync();
 
             return new AccountResult(999);
@@ -365,6 +391,53 @@ namespace VdarApi.Controllers
         }
               
         [HttpPost]
+        [Authorize]
+        public async Task<ActionResult<AccountResult>> SendEmailConfirmation()
+        {
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            User _user = await _repo.User.GetUserByIdAsync(userId);
+
+            if (_user == null)
+                return new AccountResult(905);
+
+            if (String.IsNullOrEmpty(_user.Email))
+                return new AccountResult(908);
+
+            if (!_user.EmailIsConfirmed)
+            {
+                ConfirmationKey key = new ConfirmationKey()
+                {
+                    UserId = _user.Id,
+                    HashCode = SecureCryptoGenerator.GenerateUri(),
+                    Key = "",
+                    KeyType = "confirm.Email",
+                    CreatedDateUTC = DateTime.UtcNow,
+                    ExpireDateUTC = DateTime.UtcNow.AddDays(2)
+                };
+                _repo.ConfirmationKey.Create(key);
+                await _repo.ConfirmationKey.SaveAsync();
+
+                string link = $"http://localhost:5000/EmailConfirm?uri={Uri.EscapeDataString(key.HashCode)}";
+
+                //Отправить ссылку на почту
+
+            }
+            else
+            {
+                if (!_user.EmailIsSubscribe)
+                {
+                    _user.EmailIsSubscribe = true;
+                    _repo.User.Update(_user);
+                    await _repo.User.SaveAsync();
+                }
+                return new AccountResult(997);
+            }
+
+            return new AccountResult(999);
+        }
+
+        [HttpPost]
         public async Task<ActionResult<AccountResult>> ConfirmEmail([FromQuery] ConfirmEmail model)
         {
             if (String.IsNullOrEmpty(model.Key))
@@ -385,6 +458,8 @@ namespace VdarApi.Controllers
 
             return new AccountResult(999);
         }
+
+
 
 
     }

@@ -18,6 +18,8 @@ namespace Entities.ResponseModels
             {907, "Could not find the specified subscription confirmation key" },//Не удалось продтвердить подписку на рассылку, не найден токен в таблице ConfirmationKeys,
             {908, "Email is missing" },//У пользователя не прописан email в личных данных
             {909, "Unsubscribe key incorect" },//Указанный код отписки не соответсвует коду отписки пользователя
+            {910, "Enter the current password incorrectly" },//Текущий пароль введен неверно
+            { 997, "Mail has already been verified" },//Всё ок, почта уже подтверждена ранее
             { 998, "Please, confirm email" },//Всё ок, необходимо подтвердить email на почте
             { 999, "OK" }//Всё ок
         };
