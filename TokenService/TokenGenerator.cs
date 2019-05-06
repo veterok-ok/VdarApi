@@ -24,7 +24,7 @@ namespace TokenService
         async public Task<Token> GenerateJWTTokenAsync(User user, ClientParameters parameters)
         {
             // Удаляем токен пользователя (в разрезе браузера), на случай если он украден
-            var notActualTokens = await _repo.Token.GetFailedTokensAsync(user.Id, parameters.finger_print ?? "");
+            var notActualTokens = await _repo.Token.GetFailedTokensAsync(user.UserId, parameters.finger_print ?? "");
             if (notActualTokens.Count() > 0)
             {
                 _repo.Token.Delete(notActualTokens);
@@ -34,7 +34,7 @@ namespace TokenService
             var refresh_token = Guid.NewGuid().ToString().Replace("-", "");
             var token = new Token
             {
-                UserId = user.Id,
+                UserId = user.UserId,
                 AccessToken = GetJWT(user, user.GetHashCode().ToString()),
                 RefreshToken = refresh_token,
                 UpdateHashSum = user.GetHashCode().ToString(),
@@ -59,7 +59,7 @@ namespace TokenService
             if (claims == null)
                 claims = new Claim[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                     new Claim("isEmptyProfile", IsEmptyProfile(user).ToString()),
                     new Claim(ClaimTypes.Hash, userHash)
                 };

@@ -12,7 +12,7 @@ namespace Entities
             string _salt2 = SecurePasswordHasherHelper.GenerateSalt();
             User[] users = new User[]{
                 new User {
-                    Id = 1,
+                    UserId = 1,
                     Password = SecurePasswordHasherHelper.Hash("123", _salt),
                     Salt = _salt,
                     Name = "Viktor",
@@ -30,7 +30,7 @@ namespace Entities
                     CreatedDateUtc = DateTime.UtcNow
                 },
                 new User {
-                    Id = 2,
+                    UserId = 2,
                     Password = SecurePasswordHasherHelper.Hash("123", _salt2),
                     Salt = _salt2,
                     Name = "Levon",
@@ -51,7 +51,7 @@ namespace Entities
             {
                new Country
                {
-                   Id = 1,
+                   CountryId = 1,
                    Name = "Казахстан"
                }
             };
@@ -63,43 +63,43 @@ namespace Entities
             {
                new City
                {
-                   Id = 1,
+                   CityId = 1,
                    CountryId = 1,
                    Name = "Алматы"
                },
                new City
                {
-                   Id = 2,
+                   CityId = 2,
                    CountryId = 1,
                    Name = "Нур-Султан"
                },
                new City
                {
-                   Id = 3,
+                   CityId = 3,
                    CountryId = 1,
                    Name = "Караганда"
                },
                new City
                {
-                   Id = 4,
+                   CityId = 4,
                    CountryId = 1,
                    Name = "Кызылорда"
                },
                new City
                {
-                   Id = 5,
+                   CityId = 5,
                    CountryId = 1,
                    Name = "Тараз"
                },
                new City
                {
-                   Id = 6,
+                   CityId = 6,
                    CountryId = 1,
                    Name = "Семипалатинск"
                },
                new City
                {
-                   Id = 7,
+                   CityId = 7,
                    CountryId = 1,
                    Name = "Павлодар"
                }

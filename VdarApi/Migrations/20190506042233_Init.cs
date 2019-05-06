@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace VdarApi.Migrations
 {
-    public partial class Initial : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -19,13 +19,13 @@ namespace VdarApi.Migrations
                 schema: "Info",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    CountryId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Countries", x => x.Id);
+                    table.PrimaryKey("PK_Countries", x => x.CountryId);
                 });
 
             migrationBuilder.CreateTable(
@@ -33,20 +33,20 @@ namespace VdarApi.Migrations
                 schema: "Info",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    CityId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(maxLength: 100, nullable: false),
                     CountryId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Cities", x => x.Id);
+                    table.PrimaryKey("PK_Cities", x => x.CityId);
                     table.ForeignKey(
                         name: "FK_Cities_Countries_CountryId",
                         column: x => x.CountryId,
                         principalSchema: "Info",
                         principalTable: "Countries",
-                        principalColumn: "Id",
+                        principalColumn: "CountryId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -55,7 +55,7 @@ namespace VdarApi.Migrations
                 schema: "Identity",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    UserId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Login = table.Column<string>(maxLength: 50, nullable: true),
                     Name = table.Column<string>(maxLength: 250, nullable: true),
@@ -77,13 +77,13 @@ namespace VdarApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.UserId);
                     table.ForeignKey(
                         name: "FK_Users_Cities_CityId",
                         column: x => x.CityId,
                         principalSchema: "Info",
                         principalTable: "Cities",
-                        principalColumn: "Id",
+                        principalColumn: "CityId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -92,7 +92,7 @@ namespace VdarApi.Migrations
                 schema: "Identity",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    ConfirmationKeyId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<int>(nullable: false),
                     Key = table.Column<string>(maxLength: 10, nullable: false),
@@ -103,13 +103,13 @@ namespace VdarApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ConfirmationKeys", x => x.Id);
+                    table.PrimaryKey("PK_ConfirmationKeys", x => x.ConfirmationKeyId);
                     table.ForeignKey(
                         name: "FK_ConfirmationKeys_Users_UserId",
                         column: x => x.UserId,
                         principalSchema: "Identity",
                         principalTable: "Users",
-                        principalColumn: "Id",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -118,7 +118,7 @@ namespace VdarApi.Migrations
                 schema: "Identity",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    TokenId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<int>(nullable: false),
                     AccessToken = table.Column<string>(nullable: false),
@@ -133,26 +133,26 @@ namespace VdarApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tokens", x => x.Id);
+                    table.PrimaryKey("PK_Tokens", x => x.TokenId);
                     table.ForeignKey(
                         name: "FK_Tokens_Users_UserId",
                         column: x => x.UserId,
                         principalSchema: "Identity",
                         principalTable: "Users",
-                        principalColumn: "Id",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
                 schema: "Info",
                 table: "Countries",
-                columns: new[] { "Id", "Name" },
+                columns: new[] { "CountryId", "Name" },
                 values: new object[] { 1, "Казахстан" });
 
             migrationBuilder.InsertData(
                 schema: "Info",
                 table: "Cities",
-                columns: new[] { "Id", "CountryId", "Name" },
+                columns: new[] { "CityId", "CountryId", "Name" },
                 values: new object[,]
                 {
                     { 1, 1, "Алматы" },
@@ -167,14 +167,14 @@ namespace VdarApi.Migrations
             migrationBuilder.InsertData(
                 schema: "Identity",
                 table: "Users",
-                columns: new[] { "Id", "ActivatedDateUtc", "Birthday", "CityId", "CreatedDateUtc", "Email", "EmailIsConfirmed", "EmailIsSubscribe", "EmailKeyUnSubscribe", "FathersName", "IsActive", "Login", "Name", "Password", "PhoneIsConfirmed", "PhoneNumber", "Salt", "SurName" },
-                values: new object[] { 1, new DateTime(2019, 3, 27, 10, 33, 19, 541, DateTimeKind.Utc), new DateTime(1992, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, new DateTime(2019, 4, 10, 11, 17, 31, 542, DateTimeKind.Utc), "admin@google.com", false, false, null, "Andreevich", true, "vektor", "Viktor", "k/MvNZCApSdG+YWc8i52Ce58qLf1ckL+paw6rOUCCBk=", true, "7771291221", "WHZjTtCZ45yg+/OrCOatWg==", "Bochikalov" });
+                columns: new[] { "UserId", "ActivatedDateUtc", "Birthday", "CityId", "CreatedDateUtc", "Email", "EmailIsConfirmed", "EmailIsSubscribe", "EmailKeyUnSubscribe", "FathersName", "IsActive", "Login", "Name", "Password", "PhoneIsConfirmed", "PhoneNumber", "Salt", "SurName" },
+                values: new object[] { 1, new DateTime(2019, 4, 22, 3, 38, 21, 745, DateTimeKind.Utc), new DateTime(1992, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, new DateTime(2019, 5, 6, 4, 22, 33, 746, DateTimeKind.Utc), "admin@google.com", false, false, null, "Andreevich", true, "vektor", "Viktor", "fg8qDdjIpPvQVV08hbkIRuwJc3R0D2dhZx+b/iRqR8E=", true, "7771291221", "vJCU14107jiT3prqEL0qdw==", "Bochikalov" });
 
             migrationBuilder.InsertData(
                 schema: "Identity",
                 table: "Users",
-                columns: new[] { "Id", "ActivatedDateUtc", "Birthday", "CityId", "CreatedDateUtc", "Email", "EmailIsConfirmed", "EmailIsSubscribe", "EmailKeyUnSubscribe", "FathersName", "IsActive", "Login", "Name", "Password", "PhoneIsConfirmed", "PhoneNumber", "Salt", "SurName" },
-                values: new object[] { 2, null, null, 1, new DateTime(2019, 4, 10, 11, 17, 31, 545, DateTimeKind.Utc), null, false, false, null, null, true, null, "Levon", "mAW8U7xuKGjfX71QwvQoNR0XRJonbZCc6XjQKZy1C7w=", false, "7771940504", "/Oo2pa+86NtK15v5TUKCIw==", "Kukuyan" });
+                columns: new[] { "UserId", "ActivatedDateUtc", "Birthday", "CityId", "CreatedDateUtc", "Email", "EmailIsConfirmed", "EmailIsSubscribe", "EmailKeyUnSubscribe", "FathersName", "IsActive", "Login", "Name", "Password", "PhoneIsConfirmed", "PhoneNumber", "Salt", "SurName" },
+                values: new object[] { 2, null, null, 1, new DateTime(2019, 5, 6, 4, 22, 33, 748, DateTimeKind.Utc), null, false, false, null, null, true, null, "Levon", "dgzIK7OA/2BAnSawv4pFrecYrs/NCuq5QXZIdXXoI0M=", false, "7771940504", "lkK0bFCH71jxCEAeWYHljg==", "Kukuyan" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ConfirmationKeys_UserId",

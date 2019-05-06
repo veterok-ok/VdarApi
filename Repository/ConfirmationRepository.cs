@@ -32,12 +32,12 @@ namespace Repository
                 );
 
         async public Task<ConfirmationKey> GetByUri(string uri) =>
-            await RepositoryContext.ConfirmationKeys.SingleOrDefaultAsync(c =>
+            await RepositoryContext.ConfirmationKeys.Include(user => user.User).SingleOrDefaultAsync(c =>
                    c.HashCode.Equals(uri)
                 );
 
         async public Task<ConfirmationKey> GetByHashCode(string hashcode, string type) =>
-            await RepositoryContext.ConfirmationKeys.SingleOrDefaultAsync(c =>
+            await RepositoryContext.ConfirmationKeys.Include(user => user.User).SingleOrDefaultAsync(c =>
                    c.HashCode.Equals(hashcode) &&
                    c.KeyType.Equals(type)
                 );

@@ -15,13 +15,13 @@ namespace VdarApi.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
+                .HasAnnotation("ProductVersion", "2.1.8-servicing-32085")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Entities.Models.City", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("CityId")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -31,26 +31,26 @@ namespace VdarApi.Migrations
                         .IsRequired()
                         .HasMaxLength(100);
 
-                    b.HasKey("Id");
+                    b.HasKey("CityId");
 
                     b.HasIndex("CountryId");
 
                     b.ToTable("Cities","Info");
 
                     b.HasData(
-                        new { Id = 1, CountryId = 1, Name = "Алматы" },
-                        new { Id = 2, CountryId = 1, Name = "Нур-Султан" },
-                        new { Id = 3, CountryId = 1, Name = "Караганда" },
-                        new { Id = 4, CountryId = 1, Name = "Кызылорда" },
-                        new { Id = 5, CountryId = 1, Name = "Тараз" },
-                        new { Id = 6, CountryId = 1, Name = "Семипалатинск" },
-                        new { Id = 7, CountryId = 1, Name = "Павлодар" }
+                        new { CityId = 1, CountryId = 1, Name = "Алматы" },
+                        new { CityId = 2, CountryId = 1, Name = "Нур-Султан" },
+                        new { CityId = 3, CountryId = 1, Name = "Караганда" },
+                        new { CityId = 4, CountryId = 1, Name = "Кызылорда" },
+                        new { CityId = 5, CountryId = 1, Name = "Тараз" },
+                        new { CityId = 6, CountryId = 1, Name = "Семипалатинск" },
+                        new { CityId = 7, CountryId = 1, Name = "Павлодар" }
                     );
                 });
 
             modelBuilder.Entity("Entities.Models.ConfirmationKey", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ConfirmationKeyId")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -70,7 +70,7 @@ namespace VdarApi.Migrations
 
                     b.Property<int>("UserId");
 
-                    b.HasKey("Id");
+                    b.HasKey("ConfirmationKeyId");
 
                     b.HasIndex("UserId");
 
@@ -79,7 +79,7 @@ namespace VdarApi.Migrations
 
             modelBuilder.Entity("Entities.Models.Country", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("CountryId")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -87,18 +87,18 @@ namespace VdarApi.Migrations
                         .IsRequired()
                         .HasMaxLength(100);
 
-                    b.HasKey("Id");
+                    b.HasKey("CountryId");
 
                     b.ToTable("Countries","Info");
 
                     b.HasData(
-                        new { Id = 1, Name = "Казахстан" }
+                        new { CountryId = 1, Name = "Казахстан" }
                     );
                 });
 
             modelBuilder.Entity("Entities.Models.Token", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("TokenId")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -127,7 +127,7 @@ namespace VdarApi.Migrations
 
                     b.Property<int>("UserId");
 
-                    b.HasKey("Id");
+                    b.HasKey("TokenId");
 
                     b.HasIndex("UserId");
 
@@ -136,7 +136,7 @@ namespace VdarApi.Migrations
 
             modelBuilder.Entity("Entities.Models.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -184,15 +184,15 @@ namespace VdarApi.Migrations
                     b.Property<string>("SurName")
                         .HasMaxLength(250);
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.HasIndex("CityId");
 
                     b.ToTable("Users","Identity");
 
                     b.HasData(
-                        new { Id = 1, ActivatedDateUtc = new DateTime(2019, 3, 27, 10, 33, 19, 541, DateTimeKind.Utc), Birthday = new DateTime(1992, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), CityId = 1, CreatedDateUtc = new DateTime(2019, 4, 10, 11, 17, 31, 542, DateTimeKind.Utc), Email = "admin@google.com", EmailIsConfirmed = false, EmailIsSubscribe = false, FathersName = "Andreevich", IsActive = true, Login = "vektor", Name = "Viktor", Password = "k/MvNZCApSdG+YWc8i52Ce58qLf1ckL+paw6rOUCCBk=", PhoneIsConfirmed = true, PhoneNumber = "7771291221", Salt = "WHZjTtCZ45yg+/OrCOatWg==", SurName = "Bochikalov" },
-                        new { Id = 2, CityId = 1, CreatedDateUtc = new DateTime(2019, 4, 10, 11, 17, 31, 545, DateTimeKind.Utc), EmailIsConfirmed = false, EmailIsSubscribe = false, IsActive = true, Name = "Levon", Password = "mAW8U7xuKGjfX71QwvQoNR0XRJonbZCc6XjQKZy1C7w=", PhoneIsConfirmed = false, PhoneNumber = "7771940504", Salt = "/Oo2pa+86NtK15v5TUKCIw==", SurName = "Kukuyan" }
+                        new { UserId = 1, ActivatedDateUtc = new DateTime(2019, 4, 22, 3, 38, 21, 745, DateTimeKind.Utc), Birthday = new DateTime(1992, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), CityId = 1, CreatedDateUtc = new DateTime(2019, 5, 6, 4, 22, 33, 746, DateTimeKind.Utc), Email = "admin@google.com", EmailIsConfirmed = false, EmailIsSubscribe = false, FathersName = "Andreevich", IsActive = true, Login = "vektor", Name = "Viktor", Password = "fg8qDdjIpPvQVV08hbkIRuwJc3R0D2dhZx+b/iRqR8E=", PhoneIsConfirmed = true, PhoneNumber = "7771291221", Salt = "vJCU14107jiT3prqEL0qdw==", SurName = "Bochikalov" },
+                        new { UserId = 2, CityId = 1, CreatedDateUtc = new DateTime(2019, 5, 6, 4, 22, 33, 748, DateTimeKind.Utc), EmailIsConfirmed = false, EmailIsSubscribe = false, IsActive = true, Name = "Levon", Password = "dgzIK7OA/2BAnSawv4pFrecYrs/NCuq5QXZIdXXoI0M=", PhoneIsConfirmed = false, PhoneNumber = "7771940504", Salt = "lkK0bFCH71jxCEAeWYHljg==", SurName = "Kukuyan" }
                     );
                 });
 

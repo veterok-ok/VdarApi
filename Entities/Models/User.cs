@@ -10,7 +10,7 @@ namespace Entities.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int UserId { get; set; }
         
         [MaxLength(50)]
         public string Login { get; set; }
@@ -58,8 +58,8 @@ namespace Entities.Models
         public DateTime CreatedDateUtc { get; set; }
 
 
-        public virtual List<ConfirmationKey> ConfirmationKeys { get; set; }
-        public virtual List<Token> Tokens { get; set; }
+        public List<ConfirmationKey> ConfirmationKeys { get; set; }
+        public List<Token> Tokens { get; set; }
 
     }
 }

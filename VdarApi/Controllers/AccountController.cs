@@ -79,7 +79,7 @@ namespace VdarApi.Controllers
             else _logger.LogDebug($"[Registration] При повторной регистрации пароль остался прежним.\r\nphone: {user.PhoneNumber}; \r\nsalt: {user.Salt}; \r\npassword: {user.Password};");
 
 
-            if (await _repo.ConfirmationKey.GetCountAttemptConfirmationAsync(user.Id, "SMS") > 2) {
+            if (await _repo.ConfirmationKey.GetCountAttemptConfirmationAsync(user.UserId, "SMS") > 2) {
                 var _result = new AccountResult(903);
                 _logger.LogInfo($"[Registration.Error] {_result.Message}, phone: {model.Phone};");
                 return _result;
@@ -87,7 +87,7 @@ namespace VdarApi.Controllers
 
             ConfirmationKey key = new ConfirmationKey()
             {
-                UserId = user.Id,
+                UserId = user.UserId,
                 Key = "1234",
                 KeyType = "SMS",
                 CreatedDateUTC = DateTime.UtcNow,
@@ -97,7 +97,7 @@ namespace VdarApi.Controllers
             _repo.ConfirmationKey.Create(key);
             await _repo.ConfirmationKey.SaveAsync();
 
-            await _sender.SendSMSAsync("", "", "");
+            //Выслать SMS; await _sender.SendSMSAsync("", "", "");
 
             _logger.LogDebug($"[Registration.End] phone: {model.Phone}; password: {model.Password};");
             return new AccountResult(999);
@@ -120,7 +120,7 @@ namespace VdarApi.Controllers
 
             ConfirmationKey key = new ConfirmationKey()
             {
-                UserId = user.Id,
+                UserId = user.UserId,
                 Key = model.SecurityCode,
                 KeyType = "SMS"
             };
@@ -161,7 +161,7 @@ namespace VdarApi.Controllers
                 return new AccountResult(905);
 
 
-            if (await _repo.ConfirmationKey.GetCountAttemptConfirmationAsync(user.Id, "SMS") > 2)
+            if (await _repo.ConfirmationKey.GetCountAttemptConfirmationAsync(user.UserId, "SMS") > 2)
             {
                 var _result = new AccountResult(903);
                 _logger.LogInfo($"[RecoveryPhone.Error] {_result.Message}, phone: {user.PhoneNumber};");
@@ -170,7 +170,7 @@ namespace VdarApi.Controllers
 
             ConfirmationKey key = new ConfirmationKey()
             {
-                UserId = user.Id,
+                UserId = user.UserId,
                 Key = "1234",
                 KeyType = "recovery.SMS",
                 CreatedDateUTC = DateTime.UtcNow,
@@ -199,7 +199,7 @@ namespace VdarApi.Controllers
 
             ConfirmationKey key = new ConfirmationKey()
             {
-                UserId = user.Id,
+                UserId = user.UserId,
                 HashCode = SecureCryptoGenerator.GenerateUri(),
                 Key = "1234",
                 KeyType = "recovery.Email",
@@ -232,7 +232,7 @@ namespace VdarApi.Controllers
 
             var confirmation = await _repo.ConfirmationKey.EnterConfirmationAsync(new ConfirmationKey()
             {
-                UserId = user.Id,
+                UserId = user.UserId,
                 Key = model.SecurityKey,
                 KeyType = "recovery.SMS"
             });
@@ -262,7 +262,7 @@ namespace VdarApi.Controllers
             if (confirmation == null)
                 return new AccountResult(906);
 
-            var user = await _repo.User.GetUserByIdAsync(confirmation.UserId);
+            var user = await _repo.User.GetUserByIdAsync(confirmation.User.UserId);
 
             string salt = SecurePasswordHasherHelper.GenerateSalt();
             user.Salt = salt;
@@ -274,7 +274,7 @@ namespace VdarApi.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = "BearerLT")]
         public async Task<ActionResult<AccountResult>> ChangePassword([FromQuery] ChangePassword model)
         {
             if (String.IsNullOrEmpty(model.Password) ||
@@ -300,9 +300,9 @@ namespace VdarApi.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = "BearerLT")]
         public async Task<ActionResult<AccountResult>> Subscribe()
-        {
+        {           
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             User _user = await _repo.User.GetUserByIdAsync(userId);
@@ -325,7 +325,7 @@ namespace VdarApi.Controllers
             {
                 ConfirmationKey key = new ConfirmationKey()
                 {
-                    UserId = _user.Id,
+                    UserId = _user.UserId,
                     HashCode = SecureCryptoGenerator.GenerateUri(),
                     Key = "",
                     KeyType = "confirm.Email",
@@ -345,7 +345,7 @@ namespace VdarApi.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = "BearerLT")]
         public async Task<ActionResult<AccountResult>> UnSubscribeByClick()
         {
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -391,7 +391,7 @@ namespace VdarApi.Controllers
         }
               
         [HttpPost]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = "BearerLT")]
         public async Task<ActionResult<AccountResult>> SendEmailConfirmation()
         {
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -408,7 +408,7 @@ namespace VdarApi.Controllers
             {
                 ConfirmationKey key = new ConfirmationKey()
                 {
-                    UserId = _user.Id,
+                    UserId = _user.UserId,
                     HashCode = SecureCryptoGenerator.GenerateUri(),
                     Key = "",
                     KeyType = "confirm.Email",

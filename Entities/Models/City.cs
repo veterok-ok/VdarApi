@@ -8,13 +8,14 @@ namespace Entities.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int CityId { get; set; }
 
         [Required]
         [MaxLength(100)]
         public string Name { get; set; }
 
         [Required]
+        [ForeignKey("Country")]
         public int CountryId { get; set; }
         public Country Country { get; set; }
 

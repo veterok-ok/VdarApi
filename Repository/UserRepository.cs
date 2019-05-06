@@ -33,7 +33,7 @@ namespace Repository
 
         async public Task<User> GetUserByIdAsync(int id) =>
             await RepositoryContext.Users.SingleOrDefaultAsync(u =>
-                u.Id.Equals(id));
+                u.UserId.Equals(id));
 
         
     }

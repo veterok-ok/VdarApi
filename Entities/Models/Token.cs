@@ -9,10 +9,10 @@ namespace Entities.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int TokenId { get; set; }
 
-        //Внешний ключ на связанную модель пользователя
         [Required]
+        [ForeignKey("User")]
         public int UserId { get; set; }
         public User User { get; set; }
 
