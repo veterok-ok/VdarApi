@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Helpers.Security;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VdarApi.Controllers
 {
