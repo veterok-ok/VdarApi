@@ -11,6 +11,19 @@ namespace Entities
 
         }
 
+        public DbSet<Ads> Ads { get; set; }
+
+        public DbSet<Owner> Owners { get; set; }
+
+        public DbSet<SocialNetwork> SocialNetworks { get; set; }
+        public DbSet<Stock> Stocks { get; set; }
+        public DbSet<StockDetail> StockDetails { get; set; }
+        public DbSet<StockView> StockViews { get; set; }
+        public DbSet<StockViewConfirm> StockViewConfirms { get; set; }
+        public DbSet<StockViewDetail> StockViewDetails { get; set; }
+
+        public DbSet<Winner> Winners { get; set; }
+
         public DbSet<Country> Countries { get; set; }
         public DbSet<City> Cities { get; set; }
         
